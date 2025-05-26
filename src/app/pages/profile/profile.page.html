@@ -1,0 +1,49 @@
+<ion-header [translucent]="true">
+  <ion-toolbar color="transparent">
+    <img class="logo" src="assets/logo.png">
+    <ion-title>Tele Cursos</ion-title>
+    <ion-buttons slot="end">
+      <ion-button disabled fill="clear" color="dark" size="small">
+        <ion-icon name="person"></ion-icon>
+      </ion-button>
+      <ion-button  disabled size="small" fill="clear" color="dark">
+        <ion-icon name="search"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="home-content ion-text-center" [fullscreen]="true" style="--background: #0f0f1c; color: white;">
+  <div>
+    <ion-avatar style="margin: 0 auto; width: 100px; height: 100px;">
+      <img src="assets/logo.png" alt="Avatar do Usuário">
+    </ion-avatar>
+
+    <h2 style="margin-top: 1rem;">{{ user?.name || 'Nome do Usuário' }}</h2>
+    <p style="color: #aaa;">{{ user?.email || 'email@exemplo.com' }}</p>
+
+    <ion-card style="margin-top: 2rem; background-color: #1c1c2e;">
+      <ion-card-header>
+        <ion-card-title style="color: white;">Informações do Perfil</ion-card-title>
+      </ion-card-header>
+      <ion-card-content style="color: #ccc;">
+        <p><strong>Tipo de Conta:</strong> {{ user?.premium ? 'Premium' : 'Gratuita' }}</p>
+        <p><strong>Inscrito desde:</strong> {{ user?.created_at || '01/01/2024' }}</p>
+        <!-- <p><strong>Total de Cursos:</strong> {{ user?.coursesCount || 0 }}</p> -->
+      </ion-card-content>
+    </ion-card>
+    <!-- <ion-card style="margin-top: 1.5rem; background-color: #1c1c2e;" *ngIf="user?.accessedCourses?.length">
+      <ion-card-header>
+        <ion-card-title style="color: white;">Cursos Acessados</ion-card-title>
+      </ion-card-header>
+      <ion-card-content style="color: #ccc;">
+        <ion-item lines="none" style="--background: transparent;" *ngFor="let course of user.accessedCourses">
+          <ion-label>
+            <h3 style="color: white;">{{ course.title }}</h3>
+            <p style="color: #aaa;">Acessado em {{ course.accessedAt }}</p>
+          </ion-label>
+        </ion-item>
+      </ion-card-content>
+    </ion-card> -->
+  </div>
+</ion-content>

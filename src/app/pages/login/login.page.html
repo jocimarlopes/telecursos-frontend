@@ -1,0 +1,26 @@
+
+
+<ion-content [fullscreen]="true" class="login-content">
+  <div class="login-container">
+    <div>
+      <img class="logo-image" src="assets/logomarca.png">
+    </div>
+
+    <h2 class="title">Bem-vindo 👋</h2>
+    <p class="subtitle">Entre para começar a aprender com os melhores cursos</p>
+
+    <ion-item lines="none" class="input-item">
+      <ion-input placeholder="Email" [(ngModel)]="email" type="email"></ion-input>
+    </ion-item>
+
+    <ion-item lines="none" class="input-item">
+      <ion-input placeholder="Senha" [(ngModel)]="password" type="password"></ion-input>
+    </ion-item>
+
+    <ion-button expand="block" class="login-button" (click)="doLogin()">Entrar</ion-button>
+
+    <ion-button fill="clear" class="signup-text" (click)="goRegister()">Cadastrar agora</ion-button>
+    <ion-button fill="clear" class="signup-text" (click)="goRegister()">esqueci minha senha</ion-button>
+  </div>
+</ion-content>
+

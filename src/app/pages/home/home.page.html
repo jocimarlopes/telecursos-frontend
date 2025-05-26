@@ -1,0 +1,51 @@
+<ion-header [translucent]="true">
+  <ion-toolbar color="transparent">
+    <img (click)="lista = []; getCourses(); scrollToTop()" class="logo" src="assets/logo.png">
+    <ion-title>Tele Cursos</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="goToProfile()" fill="clear" color="dark" size="small">
+        <ion-icon name="person"></ion-icon>
+      </ion-button>
+      <ion-button (click)="isSearching = !isSearching; scrollToTop()" size="small" fill="clear" color="dark">
+        <ion-icon name="search"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true" class="home-content ion-text-center">
+  <ion-refresher slot="fixed" (ionRefresh)="handleRefresh($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+
+  <ion-searchbar (ionInput)="handleInput($event)" *ngIf="isSearching" animated="false" placeholder="Pesquisar curso"></ion-searchbar>
+
+  <div *ngIf="isLoading && !lista.length" class="loading">
+    <ion-spinner color="dark" name="circular"></ion-spinner>
+  </div>
+
+  <div *ngIf="!isLoading && !lista.length" class="loading">
+    <ion-text color="dark">
+      Erro ao carregar cursos, tente novamente
+    </ion-text>
+  </div>
+
+  
+  <div *ngIf="lista.length">
+    <h2 class="section-title">Últimos adicionados</h2>
+    <ion-row>
+      <ion-col *ngFor="let course of lista" [size]="width > 600 ? 3 : 12">
+          <ion-card (click)="getCourseInfos(course)" class="course-card">
+            <img [src]="course.image" alt="Capa do curso" />
+            <ion-card-content>
+              <ion-text class="title">{{ course.title }}</ion-text>
+            </ion-card-content>
+          </ion-card>
+      </ion-col>
+    </ion-row>
+  </div>
+  <ion-infinite-scroll (ionInfinite)="onIonInfinite($event)">
+    <ion-infinite-scroll-content></ion-infinite-scroll-content>
+  </ion-infinite-scroll>
+</ion-content>
+

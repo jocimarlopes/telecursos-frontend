@@ -1,0 +1,41 @@
+
+.register-content {
+    --background: #0f0f1b;
+    color: white;
+  }
+
+  .register-container {
+    max-width: 400px;
+    width: 90%;
+    padding: 24px;
+    margin: auto;
+    text-align: center;
+  }
+
+  .title {
+    font-size: 24px;
+    font-weight: 700;
+    color: #c084fc;
+    margin-top: 24px;
+  }
+
+  .subtitle {
+    font-size: 14px;
+    color: #ccc;
+    margin-bottom: 24px;
+  }
+
+  .input-item {
+    --background: #1a1a2e;
+    --color: white;
+    margin-bottom: 16px;
+    border-radius: 8px;
+    padding: 8px 12px;
+  }
+
+  .register-button {
+    --background: #a855f7;
+    --background-hover: #9333ea;
+    margin-top: 8px;
+    border-radius: 8px;
+  }

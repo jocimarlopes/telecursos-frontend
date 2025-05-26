@@ -1,0 +1,29 @@
+
+
+<ion-content [fullscreen]="true" class="register-content">
+  <ion-buttons class="ion-margin">
+    <ion-back-button color="dark" defaultHref="/login" text=""></ion-back-button>
+  </ion-buttons>
+  <div class="register-container">
+    <h2 class="title">Criar Conta</h2>
+    <p class="subtitle">Preencha os campos abaixo para começar sua jornada</p>
+
+    <ion-item lines="none" class="input-item">
+      <ion-input placeholder="Nome" [(ngModel)]="name" type="text"></ion-input>
+    </ion-item>
+
+    <ion-item lines="none" class="input-item">
+      <ion-input placeholder="Sobrenome" [(ngModel)]="lastname" type="text"></ion-input>
+    </ion-item>
+
+    <ion-item lines="none" class="input-item">
+      <ion-input placeholder="Email" [(ngModel)]="email" type="email"></ion-input>
+    </ion-item>
+
+    <ion-item lines="none" class="input-item">
+      <ion-input placeholder="Senha" [(ngModel)]="password" type="password"></ion-input>
+    </ion-item>
+
+    <ion-button expand="block" class="register-button" (click)="doRegister()">Cadastrar</ion-button>
+  </div>
+</ion-content>
