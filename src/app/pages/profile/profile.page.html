@@ -1,7 +1,7 @@
 <ion-header [translucent]="true">
   <ion-toolbar color="transparent">
-    <img class="logo" src="assets/logo.png">
-    <ion-title>Tele Cursos</ion-title>
+    <img (click)="goBack()" class="logo" src="assets/logo.png">
+    <ion-title (click)="goBack()">Tele Cursos</ion-title>
     <ion-buttons slot="end">
       <ion-button disabled fill="clear" color="dark" size="small">
         <ion-icon name="person"></ion-icon>

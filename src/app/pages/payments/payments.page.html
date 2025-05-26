@@ -25,7 +25,7 @@
           <ion-card-title>Assinatura Ativa</ion-card-title>
         </ion-card-header>
         <ion-card-content>
-          <p style="color: #ccc;">Você é premium desde {{ premiumSince || '15/03/2024' }}</p>
+          <p style="color: #ccc;">Você é premium desde {{ formatDate(premiumSince) }}</p>
           <p style="color: #0f0;">Aproveite o acesso ilimitado a todos os cursos!</p>
         </ion-card-content>
       </ion-card>
@@ -40,7 +40,10 @@
         <ion-card-content>
           <p style="color: #ccc;">Tenha acesso a todos os cursos da plataforma pagando apenas uma vez.</p>
           <p style="color: #0f0;">Pagamento único de R$ 49,90 via Pix</p>
-          <ion-button expand="block" color="success">Solicitar Chave Pix</ion-button>
+          <img [src]="pix?.qrcode" alt="QR Code Pix" *ngIf="pix" style="width: 100%; max-width: 300px; margin: 1rem auto;">
+          <ion-button class="botao" *ngIf="!pix" (click)="getPix()" expand="block" color="success">Pagar com Pix</ion-button>
+          <ion-button fill="outline" *ngIf="pix" (click)="copiaCola()" expand="block" color="dark">Chave Copia e Cola</ion-button>
+          <ion-button class="botao" *ngIf="pix" (click)="verificaPagamento()" expand="block" color="success">Verificar Pagamento</ion-button>
         </ion-card-content>
       </ion-card>
     </ng-template>

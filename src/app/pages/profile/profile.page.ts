@@ -34,6 +34,6 @@ export class ProfilePage implements OnInit {
 
   logout() {
     this.userService.resetarUsuario()
-    this.helper.goToPage('/login');
+    this.helper.goToPage('');
   }
 }
