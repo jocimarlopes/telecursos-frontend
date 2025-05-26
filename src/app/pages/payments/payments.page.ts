@@ -45,5 +45,9 @@ export class PaymentsPage implements OnInit {
   goToProfile() {
     this.helper.goToPage('/profile');
   }
+  
+  goBack() {
+    this.helper.goToPage('/home')
+  }
 
 }

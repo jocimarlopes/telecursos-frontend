@@ -49,7 +49,7 @@ export class UserService {
     this.userDataSubject.next(null);
     this.tokenSubject.next(null);
     localStorage.clear()
-    this.helper.message('Faça o login novamente', 2000, 'warning')
+    this.helper.message('Fazendo logout...', 2000, 'warning')
     this.helper.goToPage('')
   }
 }

@@ -13,7 +13,10 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content class="home-content ion-text-center" [fullscreen]="true" style="--background: #0f0f1c; color: white;">
+<ion-content class="home-content ion-text-center" [fullscreen]="false" style="--background: #0f0f1c; color: white;">
+  <ion-button fill="clear" color="dark" class="back-button" (click)="goBack()">
+    <ion-icon name="arrow-back" slot="icon-only"></ion-icon>
+  </ion-button>
   <div >
     <ng-container *ngIf="isPremium; else naoPremium">
       <h2 style="margin-bottom: 1rem;">Você já é Premium</h2>

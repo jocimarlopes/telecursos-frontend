@@ -13,7 +13,10 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content class="home-content ion-text-center" [fullscreen]="true" style="--background: #0f0f1c; color: white;">
+<ion-content class="home-content ion-text-center" [fullscreen]="false" style="--background: #0f0f1c; color: white;">
+  <ion-button fill="clear" color="dark" class="back-button" (click)="goBack()">
+    <ion-icon name="arrow-back" slot="icon-only"></ion-icon>
+  </ion-button>
   <div>
     <ion-avatar style="margin: 0 auto; width: 100px; height: 100px;">
       <img src="assets/logo.png" alt="Avatar do Usuário">
@@ -28,8 +31,16 @@
       </ion-card-header>
       <ion-card-content style="color: #ccc;">
         <p><strong>Tipo de Conta:</strong> {{ user?.premium ? 'Premium' : 'Gratuita' }}</p>
-        <p><strong>Inscrito desde:</strong> {{ user?.created_at || '01/01/2024' }}</p>
+        <p><strong>Inscrito desde:</strong> {{ formatDate(user?.created_at) || '01/01/2024' }}</p>
         <!-- <p><strong>Total de Cursos:</strong> {{ user?.coursesCount || 0 }}</p> -->
+      </ion-card-content>
+    </ion-card>
+    <ion-card style="margin-top: 2rem; background-color: #1c1c2e;">
+      <ion-card-header>
+        <ion-card-title style="color: white;">Sair</ion-card-title>
+      </ion-card-header>
+      <ion-card-content style="color: #ccc;">
+        <ion-button color="danger" fill="outline" class="botao" expand="block" (click)="logout()">Fazer logout</ion-button>
       </ion-card-content>
     </ion-card>
     <!-- <ion-card style="margin-top: 1.5rem; background-color: #1c1c2e;" *ngIf="user?.accessedCourses?.length">

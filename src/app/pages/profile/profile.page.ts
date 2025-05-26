@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { HelperService } from 'src/app/services/helper.service';
 import { UserService } from 'src/app/services/user.service';
 
 @Component({
@@ -11,7 +12,8 @@ export class ProfilePage implements OnInit {
   user: any;
 
   constructor(
-    private userService: UserService
+    private userService: UserService,
+    private helper: HelperService
   ) { }
 
   ngOnInit() {
@@ -20,5 +22,18 @@ export class ProfilePage implements OnInit {
 
   getUser() {
     this.user = this.userService.getUserData();
+  }
+
+  goBack() {
+    this.helper.goToPage('/home')
+  }
+
+  formatDate(dateString: string): string {
+    return this.helper.epochToStringDate(dateString)
+  }
+
+  logout() {
+    this.userService.resetarUsuario()
+    this.helper.goToPage('/login');
   }
 }
