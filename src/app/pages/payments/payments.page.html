@@ -6,7 +6,7 @@
       <ion-button (click)="goToProfile()" fill="clear" color="dark" size="small">
         <ion-icon name="person"></ion-icon>
       </ion-button>
-      <ion-button  disabled size="small" fill="clear" color="dark">
+      <ion-button disabled size="small" fill="clear" color="dark">
         <ion-icon name="search"></ion-icon>
       </ion-button>
     </ion-buttons>
@@ -17,35 +17,52 @@
   <ion-button fill="clear" color="dark" class="back-button" (click)="goBack()">
     <ion-icon name="arrow-back" slot="icon-only"></ion-icon>
   </ion-button>
-  <div >
-    <ng-container *ngIf="isPremium; else naoPremium">
-      <h2 style="margin-bottom: 1rem;">Você já é Premium</h2>
-      <ion-card style="background-color: #1c1c2e; color: white;">
-        <ion-card-header>
-          <ion-card-title>Assinatura Ativa</ion-card-title>
-        </ion-card-header>
-        <ion-card-content>
-          <p style="color: #ccc;">Você é premium desde {{ formatDate(premiumSince) }}</p>
-          <p style="color: #0f0;">Aproveite o acesso ilimitado a todos os cursos!</p>
-        </ion-card-content>
-      </ion-card>
-    </ng-container>
+  <ion-row>
+    <ion-col [size]="width > 600 ? 3 : 0"></ion-col>
+    <ion-col [size]="width > 600 ? 6 : 12">
+      <div>
+        <ng-container *ngIf="isPremium; else naoPremium">
+          <h2 style="margin-bottom: 1rem;">Você já é Premium</h2>
+          <ion-card style="background-color: #1c1c2e; color: white;">
+            <ion-card-header>
+              <ion-card-title>Assinatura Ativa</ion-card-title>
+            </ion-card-header>
+            <ion-card-content>
+              <p style="color: #ccc;">Você é premium desde {{ formatDate(premiumSince) }}</p>
+              <p style="color: #0f0;">Aproveite o acesso ilimitado a todos os cursos!</p>
+            </ion-card-content>
+          </ion-card>
+        </ng-container>
 
-    <ng-template #naoPremium>
-      <h2 style="margin-bottom: 1rem;">Assine agora</h2>
-      <ion-card style="background-color: #1c1c2e; color: white;">
-        <ion-card-header>
-          <ion-card-title>Acesso Vitalício</ion-card-title>
-        </ion-card-header>
-        <ion-card-content>
-          <p style="color: #ccc;">Tenha acesso a todos os cursos da plataforma pagando apenas uma vez.</p>
-          <p style="color: #0f0;">Pagamento único de R$ 49,90 via Pix</p>
-          <img [src]="pix?.qrcode" alt="QR Code Pix" *ngIf="pix" style="width: 100%; max-width: 300px; margin: 1rem auto;">
-          <ion-button class="botao" *ngIf="!pix" (click)="getPix()" expand="block" color="success">Pagar com Pix</ion-button>
-          <ion-button fill="outline" *ngIf="pix" (click)="copiaCola()" expand="block" color="dark">Chave Copia e Cola</ion-button>
-          <ion-button class="botao" *ngIf="pix" (click)="verificaPagamento()" expand="block" color="success">Verificar Pagamento</ion-button>
-        </ion-card-content>
-      </ion-card>
-    </ng-template>
-  </div>
+        <ng-template #naoPremium>
+          <h2 style="margin-bottom: 1rem;">Assine agora</h2>
+          <ion-card style="background-color: #1c1c2e; color: white;">
+            <ion-card-header>
+              <ion-card-title>Acesso Vitalício</ion-card-title>
+            </ion-card-header>
+            <ion-card-content>
+              <p style="color: #ccc;">Tenha acesso a todos os cursos da plataforma pagando apenas uma vez, acesso vitalício.</p>
+              <p style="color: #ccc; margin-bottom: -3px;"><b>de R$99,90</b></p>
+              <p style="color: #0f0; font-size: 1.3rem; margin-top: 0px;"><b>por R$ 49,90 via Pix</b></p>
+              <p style="color: #0f0;">Pagamento Único</p>
+              <img [src]="pix?.qrcode" alt="QR Code Pix" *ngIf="pix"
+                style="width: 100%; max-width: 300px; margin: 1rem auto;">
+              <ion-button class="botao" *ngIf="!pix" (click)="getPix()" expand="block" color="success">Pagar com
+                Pix</ion-button>
+              <ion-button fill="outline" *ngIf="pix" (click)="copiaCola()" expand="block" color="dark">Chave Copia e
+                Cola</ion-button>
+              <ion-button class="botao" *ngIf="pix" (click)="verificaPagamento()" expand="block"
+                color="success">Verificar Pagamento</ion-button>
+              <ion-button *ngIf="pix" class="reset-pix" fill="clear" color="danger" (click)="resetarPix()">
+                <ion-icon name="close" slot="start"></ion-icon>
+                resetar pix
+              </ion-button>
+            </ion-card-content>
+          </ion-card>
+        </ng-template>
+      </div>
+
+    </ion-col>
+    <ion-col [size]="width > 600 ? 3 : 0"></ion-col>
+  </ion-row>
 </ion-content>
