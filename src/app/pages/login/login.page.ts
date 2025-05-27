@@ -32,10 +32,12 @@ export class LoginPage implements OnInit {
     })
   }
 
-  verifyUser() {
+  async verifyUser() {
     const token: any = localStorage.getItem('token')
     if(token && this.helper.tokenIsValid(token)) {
-      this.api.refreshToken(token).subscribe((res: any) => {
+      await this.helper.loader('Bem-vindo(a) de volta...')
+      this.api.refreshToken(token).subscribe(async (res: any) => {
+        await this.helper.closeLoader()
         if(res.status) {
           this.user.setToken(res.token)
           this.helper.goToPage('/home')
@@ -43,7 +45,8 @@ export class LoginPage implements OnInit {
           this.helper.message('Token inválido, por favor faça login novamente', 3000, 'danger')
           this.user.resetarUsuario()
         }
-      }, () => {
+      }, async () => {
+        await this.helper.closeLoader()
         this.helper.message('Erro ao verificar token, por favor faça login novamente', 3000, 'danger')
         this.user.resetarUsuario()
       })
