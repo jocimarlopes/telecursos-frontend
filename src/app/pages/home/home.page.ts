@@ -87,12 +87,12 @@ export class HomePage implements OnInit {
     }, () => this.isLoading = false)
   }
 
-  async getCourseInfos(localCourse: any) {
+  async getCourseInfos(localCourse: any) {    
     const token = this.user.getToken()
     if (!token) return this.user.resetarUsuario()
     this.isLoading = true
     await this.helper.loader('Carregando informações do curso...')
-    this.searchSubs = this.api.postWithToken('latest', {link: localCourse.link}, token).subscribe(async (data: any) => {
+    this.searchSubs = this.api.postWithToken('latest', {link: localCourse.link, name: localCourse.title}, token).subscribe(async (data: any) => {
       await this.helper.closeLoader()
       this.isLoading = false
       const infos = {...data.data, image: localCourse.image}
