@@ -30,7 +30,6 @@
                 (click)="openLink(item)"
                 target="_blank"
                 expand="block"
-                size="small"
                 style="margin-top: 0.5rem;">
       {{ item.text }}
     </ion-button>
@@ -40,13 +39,12 @@
                 (click)="solicitarCertificado(details)"
                 target="_blank"
                 expand="block"
-                size="small"
                 fill="clear"
                 style="margin-top: 0.5rem;"
                 class="botao-certificado"
                 >
                 
-      Solicitar Certificado
+      {{solicitarCertificadoText}}
     </ion-button>
 
     <p *ngIf="isPremium" class="aviso">* Este curso não é válido para horas complementares de ensino</p>

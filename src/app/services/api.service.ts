@@ -38,6 +38,14 @@ export class ApiService {
     return this.http.post(`${environment.API_URL}/${url}`, {}, { headers: headers}).pipe(map((res: any) => res));
   }
 
+  postWithTokenBlob(url: string, dados: any, token: string) {
+    const headers = new HttpHeaders({ 
+      "Authorization": "Bearer " + btoa(encodeURIComponent(JSON.stringify(dados))),
+      "Token": token,
+    })
+    return this.http.post(`${environment.API_URL}/${url}`, {}, { headers: headers, responseType: 'blob'}).pipe(map((res: any) => res));
+  }
+
   refreshToken(token: string) {
     const headers = new HttpHeaders({ 
       "Token": token,
