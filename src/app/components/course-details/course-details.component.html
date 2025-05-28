@@ -28,7 +28,6 @@
   <div *ngIf="details?.links?.length" style="margin-top: 1.5rem; text-align: center;">
     <ion-button *ngFor="let item of details.links" class="botao"
                 (click)="openLink(item)"
-                target="_blank"
                 expand="block"
                 style="margin-top: 0.5rem;">
       {{ item.text }}
@@ -37,7 +36,6 @@
                 [disabled]="verifyDownloadDate(details?.download_infos?.downloaded_at)"
                 *ngIf="details?.download_infos"
                 (click)="solicitarCertificado(details)"
-                target="_blank"
                 expand="block"
                 fill="clear"
                 style="margin-top: 0.5rem;"
@@ -45,6 +43,17 @@
                 >
                 
       {{solicitarCertificadoText}}
+    </ion-button>
+    <ion-button
+                [disabled]="true"
+                *ngIf="!details.download_infos"
+                expand="block"
+                fill="clear"
+                style="margin-top: 0.5rem;"
+                class="botao-certificado"
+                >
+                
+      Faça o curso para emitir o certificado
     </ion-button>
 
     <p *ngIf="isPremium" class="aviso">* Este curso não é válido para horas complementares de ensino</p>

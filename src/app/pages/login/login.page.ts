@@ -11,8 +11,8 @@ import { UserService } from 'src/app/services/user.service';
 })
 export class LoginPage implements OnInit {
 
-  email?: string
-  password?: string
+  email: string = ''
+  password: string = ''
 
   constructor(
     private helper: HelperService,
@@ -26,6 +26,8 @@ export class LoginPage implements OnInit {
   }
 
   verifyCredentials() {
+    this.email = localStorage.getItem('email') || ''
+    this.password = localStorage.getItem('password') || ''
     this.user.userCredentials$.subscribe(data => {
       this.email = data?.email
       this.password = data?.password
@@ -40,6 +42,8 @@ export class LoginPage implements OnInit {
         await this.helper.closeLoader()
         if(res.status) {
           this.user.setToken(res.token)
+          localStorage.setItem('email', this.email)
+          localStorage.setItem('password', this.password)
           this.helper.goToPage('/home')
         } else {
           this.helper.message('Token inválido, por favor faça login novamente', 3000, 'danger')
