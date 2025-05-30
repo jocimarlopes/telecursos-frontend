@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ApiService } from 'src/app/services/api.service';
 import { HelperService } from 'src/app/services/helper.service';
+import { PixelTrackerService } from 'src/app/services/pixel-tracker.service';
 import { UserService } from 'src/app/services/user.service';
 import { environment } from 'src/environments/environment';
 
@@ -20,7 +21,8 @@ export class RegisterPage implements OnInit {
   constructor(
     private helper: HelperService,
     private user: UserService,
-    private api: ApiService
+    private api: ApiService,
+    private tracking: PixelTrackerService
   ) { }
 
   ngOnInit() {
@@ -39,6 +41,7 @@ export class RegisterPage implements OnInit {
       await this.helper.closeLoader()
       if(res.status) {
         await this.helper.message('Usuário cadastrado com sucesso', 3000, 'success')
+        // this.tracking.onRegister()
         this.user.setCredentials({email: this.email, password: this.password})
         this.helper.goToPage('')
         return

@@ -1,4 +1,6 @@
 import { Component, OnInit } from '@angular/core';
+import { ModalController } from '@ionic/angular';
+import { WelcomeComponent } from 'src/app/components/welcome/welcome.component';
 import { ApiService } from 'src/app/services/api.service';
 import { HelperService } from 'src/app/services/helper.service';
 import { UserService } from 'src/app/services/user.service';
@@ -17,13 +19,34 @@ export class LoginPage implements OnInit {
   constructor(
     private helper: HelperService,
     private user: UserService,
-    private api: ApiService
+    private api: ApiService,
+    private modal: ModalController
   ) { }
 
   ngOnInit() {
     this.verifyCredentials()
     this.verifyUser()
+    this.verifyWelcome()
   }
+
+  verifyWelcome() {
+    const welcome = localStorage.getItem('welcome')
+    if (!welcome) {
+      this.openWelcomeModal()
+    }
+  }
+
+  async openWelcomeModal() {
+    const modal = await this.modal.create({
+      component: WelcomeComponent,
+      cssClass: 'welcome-modal',
+      backdropDismiss: false
+    })
+
+    await modal.present()
+  }
+
+
 
   verifyCredentials() {
     this.email = localStorage.getItem('email') || ''

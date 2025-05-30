@@ -48,7 +48,13 @@ ion-modal {
     --max-width: 800px;
     --max-height: 100%;
   }
-
+ion-modal.welcome-modal {
+    --width: 100%;
+    --height: 100%;
+    --max-width: 800px;
+    --max-height: 100%;
+    --border-radius: 0px;
+}
 .home-content {
     --background: #0f0f1b;
     color: white;

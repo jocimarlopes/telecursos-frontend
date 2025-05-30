@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { AlertController, ModalController } from '@ionic/angular';
 import { ApiService } from 'src/app/services/api.service';
 import { HelperService } from 'src/app/services/helper.service';
+import { PixelTrackerService } from 'src/app/services/pixel-tracker.service';
 import { UserService } from 'src/app/services/user.service';
 
 @Component({
@@ -21,7 +22,8 @@ export class PaymentsPage implements OnInit {
     private user: UserService,
     private helper: HelperService,
     private api: ApiService,
-    private alert: AlertController
+    private alert: AlertController,
+    private tracking: PixelTrackerService
   ) { }
 
   ngOnInit() {
@@ -73,6 +75,7 @@ export class PaymentsPage implements OnInit {
     this.api.postWithToken('pix', {}, token).subscribe(async (data) => {
       await this.helper.closeLoader();
       if (data.status) {
+        this.tracking.initPurchase()
         this.pix = data.pix
         localStorage.setItem('pix', JSON.stringify(data.pix));
       } else {
@@ -91,8 +94,8 @@ export class PaymentsPage implements OnInit {
     await this.helper.loader('Obtendo Pix...');
     this.api.postWithToken('pix/status', { id: this.pix.id }, token).subscribe(async (data) => {
       await this.helper.closeLoader();
-      console.log(data);
       if (data.status) {
+        this.tracking.onPurchasePremium()
         this.helper.message('Pagamento confirmado!', 2000, 'success');
         this.user.setToken(data.token);
         this.helper.goToPage('/home');
