@@ -11,7 +11,11 @@ export class PixelTrackerService {
 
   onRegister() {
     // fbq('track', 'CompleteRegistration'); // Evento de cadastro
-    ttq.track('CompleteRegistration');
+    ttq.track('CompleteRegistration', {
+      method: 'email', // ou 'google', 'facebook', etc
+      user_type: 'free', // ou 'premium' se for direto no plano pago
+      referrer: 'tiktok_ad'
+    });
   }
 
   onPurchasePremium() {
@@ -21,7 +25,9 @@ export class PixelTrackerService {
     // });
     ttq.track('Purchase', {
       value: 49.90,
-      currency: 'BRL'
+      currency: 'BRL',
+      course_name: 'Conta Premium Vitalício',
+      plan: 'vitalício'
     });
   }
 
@@ -37,13 +43,29 @@ export class PixelTrackerService {
   }
 
   onWelcome() {
-    // ttq.page()
+    ttq.track('ViewContent');
   }
 
   initPurchase() {
     // fbq('track', 'InitiateCheckout');
-    ttq.track('AddPaymentInfo');
+    ttq.track('AddPaymentInfo', {
+      plan: 'Vitalício',
+      value: 49.90,
+      currency: 'BRL'
+    });
+  }
 
+  onGoRegister() {
+    ttq.track('ClickButton');
+  }
+
+  onSearch(searchTerm: string, contentName: string) {
+    ttq.track('Search', {
+      content_type: 'course',
+      content_name: contentName,
+      content_category: 'cursos',
+      query: searchTerm
+    });
   }
 
   

@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ModalController } from '@ionic/angular';
 import { HelperService } from 'src/app/services/helper.service';
-// import { PixelTrackerService } from 'src/app/services/pixel-tracker.service';
+import { PixelTrackerService } from 'src/app/services/pixel-tracker.service';
 
 @Component({
   selector: 'app-welcome',
@@ -14,15 +14,15 @@ export class WelcomeComponent  implements OnInit {
   constructor(
     private helper: HelperService,
     private modal: ModalController,
-    // private tracking: PixelTrackerService
+    private tracking: PixelTrackerService
   ) { }
 
   ngOnInit() {
-
+    this.tracking.onWelcome()
   }
 
   register() {
-    // this.tracking.onRegister()
+    this.tracking.onGoRegister()
     this.helper.goToPage('register')
     this.close()
   }

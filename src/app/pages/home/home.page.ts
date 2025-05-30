@@ -3,6 +3,7 @@ import { InfiniteScrollCustomEvent, IonContent, ModalController } from '@ionic/a
 import { CourseDetailsComponent } from 'src/app/components/course-details/course-details.component';
 import { ApiService } from 'src/app/services/api.service';
 import { HelperService } from 'src/app/services/helper.service';
+import { PixelTrackerService } from 'src/app/services/pixel-tracker.service';
 import { UserService } from 'src/app/services/user.service';
 
 @Component({
@@ -27,7 +28,8 @@ export class HomePage implements OnInit {
     private api: ApiService,
     private helper: HelperService,
     private user: UserService,
-    private modal: ModalController
+    private modal: ModalController,
+    private tracking: PixelTrackerService
   ) { }
 
   ngOnInit() {
@@ -84,6 +86,9 @@ export class HomePage implements OnInit {
       this.isLoading = false
       this.nextPage = '1'
       this.lista = data.data
+      if(data.data.length) {
+        this.tracking.onSearch(search, this.lista[0].title || 'Curso Profissionalizante');
+      }
     }, () => this.isLoading = false)
   }
 
