@@ -47,13 +47,26 @@
     <ion-button
                 [disabled]="true"
                 *ngIf="!details.download_infos"
-                expand="block"
                 fill="clear"
+                expand="block"
+                size="small"
                 style="margin-top: 0.5rem;"
                 class="botao-certificado"
                 >
                 
       Faça o curso para emitir o certificado
+    </ion-button>
+    <ion-button
+                *ngIf="details?.links?.length"
+                fill="clear"
+                expand="block"
+                size="small"
+                color="medium"
+                class="botao-tutorial"
+                (click)="presentPopover()"
+                >
+                
+      como acessar o curso?
     </ion-button>
 
     <p *ngIf="isPremium" class="aviso">* Este curso não é válido para horas complementares de ensino</p>

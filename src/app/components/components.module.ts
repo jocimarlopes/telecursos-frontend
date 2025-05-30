@@ -3,13 +3,15 @@ import { CommonModule } from '@angular/common';
 import { CourseDetailsComponent } from './course-details/course-details.component';
 import { IonicModule } from '@ionic/angular';
 import { WelcomeComponent } from './welcome/welcome.component';
+import { TutorialTorrentComponent } from './tutorial-torrent/tutorial-torrent.component';
 
 
 
 @NgModule({
   declarations: [
     CourseDetailsComponent,
-    WelcomeComponent
+    WelcomeComponent,
+    TutorialTorrentComponent
   ],
   imports: [
     CommonModule,
@@ -17,7 +19,8 @@ import { WelcomeComponent } from './welcome/welcome.component';
   ],
   exports: [
     CourseDetailsComponent,
-    WelcomeComponent
+    WelcomeComponent,
+    TutorialTorrentComponent
   ],
   schemas: [
     NO_ERRORS_SCHEMA,

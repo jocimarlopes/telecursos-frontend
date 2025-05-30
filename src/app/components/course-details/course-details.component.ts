@@ -1,8 +1,9 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { ModalController } from '@ionic/angular';
+import { ModalController, PopoverController } from '@ionic/angular';
 import { ApiService } from 'src/app/services/api.service';
 import { HelperService } from 'src/app/services/helper.service';
 import { UserService } from 'src/app/services/user.service';
+import { TutorialTorrentComponent } from '../tutorial-torrent/tutorial-torrent.component';
 
 @Component({
   selector: 'course-details',
@@ -21,7 +22,8 @@ export class CourseDetailsComponent implements OnInit {
     private modal: ModalController,
     private helper: HelperService,
     private user: UserService,
-    private api: ApiService
+    private api: ApiService,
+    private popover: PopoverController
   ) { }
 
   ngOnInit() {
@@ -114,5 +116,13 @@ export class CourseDetailsComponent implements OnInit {
       this.solicitarCertificadoText = 'Emitir Certificado';
       clearInterval(this.timeoutSubscription);
     }
+  }
+
+
+  async presentPopover() {
+    const popover = await this.popover.create({
+      component: TutorialTorrentComponent
+    });
+    await popover.present();
   }
 }
