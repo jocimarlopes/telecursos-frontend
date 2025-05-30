@@ -41,7 +41,7 @@ export class RegisterPage implements OnInit {
       await this.helper.closeLoader()
       if(res.status) {
         await this.helper.message('Usuário cadastrado com sucesso', 3000, 'success')
-        // this.tracking.onRegister()
+        this.tracking.onRegister()
         this.user.setCredentials({email: this.email, password: this.password})
         this.helper.goToPage('')
         return

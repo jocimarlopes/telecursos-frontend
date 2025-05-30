@@ -37,7 +37,7 @@ export class PixelTrackerService {
   }
 
   onWelcome() {
-    ttq.page()
+    // ttq.page()
   }
 
   initPurchase() {
