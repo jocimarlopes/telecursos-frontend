@@ -10,15 +10,21 @@ export class UserService {
   private userDataSubject = new BehaviorSubject<string | null>(null);
   private tokenSubject = new BehaviorSubject<string | null>(null);
   private userCredentials = new BehaviorSubject<any>(null)
+  private isCertificado = new BehaviorSubject<boolean>(true);
 
   userData$: Observable<any> = this.userDataSubject.asObservable();
   token$: Observable<string | null> = this.tokenSubject.asObservable();
   userCredentials$: Observable<any> = this.userCredentials.asObservable();
+  isCertificado$: Observable<boolean> = this.isCertificado.asObservable();
 
   constructor(private helper: HelperService) {}
 
   private setUserData(data: any) {
     this.userDataSubject.next(data);
+  }
+
+  public setCertified(isCertified: boolean) {
+    this.isCertificado.next(isCertified);
   }
 
   setToken(token: string) {

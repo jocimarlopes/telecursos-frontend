@@ -43,9 +43,8 @@
             <ion-card-content>
               <p style="color: #ccc;">Tenha acesso a todos os cursos da plataforma pagando apenas uma vez, acesso vitalício.</p>
               <p style="color: #ccc; margin-bottom: -3px;"><b>de R$99,90</b></p>
-              <p style="color: #0f0; font-size: 1.3rem; margin-top: 0px;"><b>por R$ 49,90 via Pix</b></p>
+              <p style="color: #0f0; font-size: 1.3rem; margin-top: 0px;"><b>por R$ 49,00 via Pix</b></p>
               <p style="color: #0f0;">Pagamento Único</p>
-              <p *ngIf="pix" style="color: #fff;">Conta: J. L. SILVEIRA</p>
               <img [src]="pix?.qrcode" alt="QR Code Pix" *ngIf="pix"
                 style="width: 100%; max-width: 300px; margin: 1rem auto;">
               <ion-button class="botao" *ngIf="!pix" (click)="getPix()" expand="block" color="success">Pagar com

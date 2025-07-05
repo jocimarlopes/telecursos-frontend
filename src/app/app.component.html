@@ -1,3 +1,6 @@
 <ion-app>
-  <ion-router-outlet></ion-router-outlet>
+  <ion-router-outlet *ngIf="!certificado && !waiting"></ion-router-outlet>
+  <ion-content *ngIf="certificado">
+    <img [src]="certificado" class="certificado" alt="Certificado" />
+  </ion-content>
 </ion-app>

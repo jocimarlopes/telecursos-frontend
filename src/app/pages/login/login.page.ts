@@ -26,7 +26,11 @@ export class LoginPage implements OnInit {
   ngOnInit() {
     this.verifyCredentials()
     this.verifyUser()
-    this.verifyWelcome()
+    this.user.isCertificado$.subscribe(isCertificado => {
+      if (!isCertificado) {
+        this.verifyWelcome()
+      }
+    })
   }
 
   verifyWelcome() {

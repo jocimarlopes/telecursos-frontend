@@ -20,11 +20,11 @@ export class PixelTrackerService {
 
   onPurchasePremium() {
     // fbq('track', 'Purchase', {
-    //   value: 49.90, // valor da compra
+    //   value: 49.00, // valor da compra
     //   currency: 'BRL'
     // });
     ttq.track('Purchase', {
-      value: 49.90,
+      value: 49.00,
       currency: 'BRL',
       course_name: 'Conta Premium Vitalício',
       plan: 'vitalício'
@@ -50,7 +50,7 @@ export class PixelTrackerService {
     // fbq('track', 'InitiateCheckout');
     ttq.track('AddPaymentInfo', {
       plan: 'Vitalício',
-      value: 49.90,
+      value: 49.00,
       currency: 'BRL'
     });
   }

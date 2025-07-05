@@ -25,6 +25,15 @@
     <h2 style="margin-top: 1rem;">{{ user?.name || 'Nome do Usuário' }}</h2>
     <p style="color: #aaa;">{{ user?.email || 'email@exemplo.com' }}</p>
 
+    <ion-card (click)="goToMyCourses()" style="margin-top: 2rem; background-color: #1c1c2e;">
+      <ion-card-header>
+        <ion-card-title style="color: white;">Meus Cursos</ion-card-title>
+      </ion-card-header>
+      <ion-card-content style="color: #ccc;">
+        <p><strong>Aperte aqui para ir aos seus cursos acessados</strong></p>
+      </ion-card-content>
+    </ion-card>
+
     <ion-card style="margin-top: 2rem; background-color: #1c1c2e;">
       <ion-card-header>
         <ion-card-title style="color: white;">Informações do Perfil</ion-card-title>

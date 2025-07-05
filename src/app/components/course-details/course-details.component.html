@@ -30,6 +30,7 @@
                 (click)="openLink(item)"
                 expand="block"
                 style="margin-top: 0.5rem;">
+                <ion-icon slot="start" name="cloud-download-outline"></ion-icon>
       {{ item.text }}
     </ion-button>
     <ion-button
@@ -61,7 +62,7 @@
                 fill="clear"
                 expand="block"
                 size="small"
-                color="medium"
+                color="dark"
                 class="botao-tutorial"
                 (click)="presentPopover()"
                 >
@@ -69,6 +70,6 @@
       como acessar o curso?
     </ion-button>
 
-    <p *ngIf="isPremium" class="aviso">* Este curso não é válido para horas complementares de ensino</p>
+    <!-- <p *ngIf="isPremium" class="aviso">* Este curso não é válido para horas complementares de ensino</p> -->
   </div>
 </ion-content>

@@ -36,4 +36,8 @@ export class ProfilePage implements OnInit {
     this.userService.resetarUsuario()
     this.helper.goToPage('');
   }
+
+  goToMyCourses() {
+    this.helper.goToPage('/my-courses');
+  }
 }

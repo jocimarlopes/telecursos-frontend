@@ -62,6 +62,8 @@ export class CourseDetailsComponent implements OnInit {
   }
 
   async solicitarCertificado(details: any) {
+    console.log(details, '<- details');
+    
     const token = this.user.getToken();
     if (!token) return this.user.resetarUsuario();
     await this.helper.loader('Solicitando certificado...');
