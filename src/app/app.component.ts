@@ -42,6 +42,7 @@ export class AppComponent {
             await this.helper.closeLoader()
             const url = URL.createObjectURL(data);
             this.certificado = url;            
+            this.helper.message('Certificado verificado com sucesso!', 5000, 'success');
           },
           error: async (err) => { 
             this.verifyCertified()
