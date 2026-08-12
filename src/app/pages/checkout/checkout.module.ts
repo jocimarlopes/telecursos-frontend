@@ -5,9 +5,9 @@ import { RouterModule, Routes } from '@angular/router';
 import { IonicModule } from '@ionic/angular';
 import { ComponentsModule } from 'src/app/components/components.module';
 
-import { PaymentsPage } from './payments.page';
+import { CheckoutPage } from './checkout.page';
 
-const routes: Routes = [{ path: '', component: PaymentsPage }];
+const routes: Routes = [{ path: '', component: CheckoutPage }];
 
 @NgModule({
   imports: [
@@ -17,6 +17,6 @@ const routes: Routes = [{ path: '', component: PaymentsPage }];
     RouterModule.forChild(routes),
     ComponentsModule,
   ],
-  declarations: [PaymentsPage],
+  declarations: [CheckoutPage],
 })
-export class PaymentsPageModule { }
+export class CheckoutPageModule { }

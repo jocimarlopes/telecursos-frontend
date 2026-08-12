@@ -1,0 +1,210 @@
+<app-header [back]="true" title="Pagamento"></app-header>
+
+<ion-content class="tc-page">
+  <div class="tc-container tc-container--narrow">
+
+    <!-- Nada a pagar agora: vitalício, ou mensal ainda longe do vencimento -->
+    <div class="tc-card" *ngIf="accessBlocked">
+      <div class="tc-card__body checkout__done">
+        <span class="tc-seal tc-seal--valid">
+          <ion-icon name="checkmark-circle"></ion-icon>
+          {{ isLifetime ? 'Acesso permanente' : 'Assinatura ativa' }}
+        </span>
+
+        <p class="checkout__done-text" *ngIf="isLifetime">
+          Sua conta tem acesso permanente a todos os cursos. Não há mensalidade
+          a pagar.
+        </p>
+
+        <p class="checkout__done-text" *ngIf="!isLifetime">
+          Sua assinatura vale até
+          <strong>{{ helper.formatDate(subscription?.until) }}</strong>
+          ({{ daysLeft }} dia(s)). A renovação abre nos últimos 5 dias.
+        </p>
+
+        <ion-button class="tc-btn" fill="outline" routerLink="/pagamentos">
+          Ver meus pagamentos
+        </ion-button>
+      </div>
+    </div>
+
+    <ng-container *ngIf="!accessBlocked">
+      <h1 class="tc-section-title">
+        {{ isCertificate ? 'Pagar certificado'
+           : isRenewal ? 'Renovar assinatura' : 'Assinatura mensal' }}
+      </h1>
+      <p class="tc-section-sub">
+        {{ isCertificate
+           ? 'Conclua o pagamento para liberar a emissão do seu certificado.'
+           : isRenewal
+             ? 'Os dias que ainda restam são somados ao novo mês.'
+             : 'Acesso a todos os cursos por 30 dias. Sem fidelidade.' }}
+      </p>
+
+      <div class="checkout__expired" *ngIf="subscription?.expired && !isCertificate">
+        <ion-icon name="alert-circle-outline"></ion-icon>
+        <span>
+          Sua assinatura venceu em {{ helper.formatDate(subscription?.until) }}.
+          Renove para voltar a acessar os cursos.
+        </span>
+      </div>
+
+      <!-- Resumo -->
+      <div class="tc-card checkout__summary">
+        <div class="tc-card__body">
+          <div class="checkout__line">
+            <span>{{ isCertificate ? 'Certificado · emissão imediata'
+                                   : 'Assinatura mensal · 30 dias' }}</span>
+            <strong>{{ helper.formatMoney(amountCents) }}</strong>
+          </div>
+          <p class="checkout__line-note" *ngIf="isCertificate">
+            Assim que o pagamento for confirmado, o certificado fica disponível
+            para baixar em Meus certificados.
+          </p>
+          <p class="checkout__line-note" *ngIf="!isCertificate">
+            Cobrança avulsa: nada é debitado automaticamente. Ao vencer, você
+            escolhe se renova.
+          </p>
+        </div>
+      </div>
+
+      <!-- CPF: exigido pelo Mercado Pago para identificar o pagador -->
+      <label class="tc-label" for="cpf">CPF do pagador</label>
+      <ion-item lines="none" class="tc-field"
+                [class.tc-field--invalid]="!!cpfError">
+        <ion-input id="cpf" inputmode="numeric" placeholder="000.000.000-00"
+                   [value]="cpf" (ionInput)="onCpfInput($event)"
+                   (ionBlur)="cpfTouched = true" maxlength="14"></ion-input>
+      </ion-item>
+      <span class="tc-field-error" *ngIf="cpfError">{{ cpfError }}</span>
+
+      <!-- Forma de pagamento -->
+      <ion-segment class="checkout__tabs" [(ngModel)]="method" mode="md">
+        <ion-segment-button value="pix">
+          <ion-label>Pix</ion-label>
+        </ion-segment-button>
+        <ion-segment-button value="card">
+          <ion-label>Cartão</ion-label>
+        </ion-segment-button>
+      </ion-segment>
+
+      <p class="auth__error" *ngIf="error" role="alert">{{ error }}</p>
+
+      <!-- Pix -->
+      <div class="tc-card" *ngIf="method === 'pix'">
+        <div class="tc-card__body">
+          <ng-container *ngIf="!pix">
+            <p class="checkout__hint">
+              O código Pix é gerado na hora e vale por 30 minutos.
+              Seu mês de acesso começa assim que o pagamento cair.
+            </p>
+            <ion-button expand="block" class="tc-btn"
+                        [disabled]="submitting" (click)="generatePix()">
+              <ion-spinner *ngIf="submitting" name="crescent" slot="start"></ion-spinner>
+              {{ submitting ? 'Gerando…' : 'Gerar código Pix' }}
+            </ion-button>
+          </ng-container>
+
+          <ng-container *ngIf="pix">
+            <img class="checkout__qr" [src]="pix.qrcode" alt="QR Code do Pix">
+
+            <ion-button expand="block" fill="outline" class="tc-btn" (click)="copyPix()">
+              <ion-icon slot="start" name="copy-outline"></ion-icon>
+              Copiar código Pix
+            </ion-button>
+
+            <ion-button expand="block" class="tc-btn checkout__check"
+                        [disabled]="checkingPix" (click)="checkPix()">
+              <ion-spinner *ngIf="checkingPix" name="crescent" slot="start"></ion-spinner>
+              Já paguei
+            </ion-button>
+
+            <p class="checkout__hint checkout__hint--center">
+              Estamos conferindo o pagamento automaticamente. Você pode deixar
+              esta tela aberta.
+            </p>
+
+            <ion-button fill="clear" size="small" color="danger" expand="block"
+                        (click)="resetPix()">
+              Descartar este Pix
+            </ion-button>
+          </ng-container>
+        </div>
+      </div>
+
+      <!-- Cartão -->
+      <div class="tc-card" *ngIf="method === 'card'">
+        <div class="tc-card__body">
+          <p class="checkout__hint" *ngIf="!cardReady">
+            O pagamento com cartão está indisponível no momento. Use o Pix.
+          </p>
+
+          <form *ngIf="cardReady" #cardForm="ngForm"
+                (ngSubmit)="payWithCard({
+                  number: cardNumber, holder: cardHolder,
+                  month: cardMonth, year: cardYear, cvv: cardCvv })">
+
+            <label class="tc-label" for="cardNumber">Número do cartão</label>
+            <ion-item lines="none" class="tc-field">
+              <ion-input id="cardNumber" inputmode="numeric" placeholder="0000 0000 0000 0000"
+                         [(ngModel)]="cardNumber" name="cardNumber"
+                         maxlength="19"></ion-input>
+            </ion-item>
+
+            <label class="tc-label" for="cardHolder">Nome impresso no cartão</label>
+            <ion-item lines="none" class="tc-field">
+              <ion-input id="cardHolder" placeholder="Como está no cartão"
+                         [(ngModel)]="cardHolder" name="cardHolder"></ion-input>
+            </ion-item>
+
+            <div class="checkout__row">
+              <div>
+                <label class="tc-label" for="cardMonth">Mês</label>
+                <ion-item lines="none" class="tc-field">
+                  <ion-input id="cardMonth" inputmode="numeric" placeholder="MM"
+                             [(ngModel)]="cardMonth" name="cardMonth" maxlength="2"></ion-input>
+                </ion-item>
+              </div>
+              <div>
+                <label class="tc-label" for="cardYear">Ano</label>
+                <ion-item lines="none" class="tc-field">
+                  <ion-input id="cardYear" inputmode="numeric" placeholder="AAAA"
+                             [(ngModel)]="cardYear" name="cardYear" maxlength="4"></ion-input>
+                </ion-item>
+              </div>
+              <div>
+                <label class="tc-label" for="cardCvv">CVV</label>
+                <ion-item lines="none" class="tc-field">
+                  <ion-input id="cardCvv" inputmode="numeric" placeholder="123"
+                             [(ngModel)]="cardCvv" name="cardCvv" maxlength="4"></ion-input>
+                </ion-item>
+              </div>
+            </div>
+
+            <label class="tc-label" for="parcelas">Parcelamento</label>
+            <ion-item lines="none" class="tc-field">
+              <ion-select id="parcelas" [(ngModel)]="installments" name="installments"
+                          interface="popover" placeholder="À vista">
+                <ion-select-option *ngFor="let n of installmentOptions" [value]="n">
+                  {{ n }}x de {{ helper.formatMoney(amountCents / n) }}
+                  {{ n === 1 ? '(à vista)' : '' }}
+                </ion-select-option>
+              </ion-select>
+            </ion-item>
+
+            <ion-button type="submit" expand="block" class="tc-btn"
+                        [disabled]="submitting">
+              <ion-spinner *ngIf="submitting" name="crescent" slot="start"></ion-spinner>
+              {{ submitting ? 'Processando…' : 'Pagar ' + helper.formatMoney(amountCents) }}
+            </ion-button>
+
+            <p class="checkout__hint checkout__hint--center">
+              <ion-icon name="lock-closed-outline"></ion-icon>
+              Os dados do cartão vão criptografados direto para o Mercado Pago.
+            </p>
+          </form>
+        </div>
+      </div>
+    </ng-container>
+  </div>
+</ion-content>
