@@ -1,5 +1,6 @@
+import { Location } from '@angular/common';
 import { Injectable } from '@angular/core';
-import { Router } from '@angular/router';
+import { NavigationExtras, Router } from '@angular/router';
 import { AlertController, LoadingController, ToastController } from '@ionic/angular';
 import { Platform } from '@ionic/angular';
 import { jwtDecode } from 'jwt-decode';
@@ -20,6 +21,7 @@ export class HelperService {
     private router: Router,
     private platform: Platform,
     private alert: AlertController,
+    private location: Location,
   ) {
     this.verifyScreenWidth()
   }
@@ -39,8 +41,87 @@ export class HelperService {
     return this.platform.is('ios')
   }
 
+  /**
+   * Fecha o loader. O `dismiss()` rejeita quando não há nenhum aberto, o que
+   * derrubava o fluxo em qualquer caminho de erro que chamasse isso duas vezes.
+   */
   async closeLoader() {
-    this.loading.dismiss()
+    try {
+      await this.loading.dismiss()
+    } catch {
+      // nenhum loader aberto — nada a fazer
+    }
+  }
+
+  // --- CPF -----------------------------------------------------------------
+
+  public formatCpf(value: string): string {
+    const digits = this.removeSpecialKeys(value || '').slice(0, 11)
+    return digits
+      .replace(/(\d{3})(\d)/, '$1.$2')
+      .replace(/(\d{3})(\d)/, '$1.$2')
+      .replace(/(\d{3})(\d{1,2})$/, '$1-$2')
+  }
+
+  /** Valida o CPF pelos dígitos verificadores (mesma regra do backend). */
+  public isValidCpf(value: string): boolean {
+    const cpf = this.removeSpecialKeys(value || '')
+    if (cpf.length !== 11 || /^(\d)\1{10}$/.test(cpf)) return false
+
+    for (const length of [9, 10]) {
+      let total = 0
+      for (let i = 0; i < length; i++) {
+        total += parseInt(cpf[i], 10) * (length + 1 - i)
+      }
+      let check = (total * 10) % 11
+      if (check === 10) check = 0
+      if (check !== parseInt(cpf[length], 10)) return false
+    }
+    return true
+  }
+
+  // --- valores e datas -----------------------------------------------------
+
+  public formatMoney(cents: number): string {
+    return ((cents || 0) / 100).toLocaleString('pt-BR', {
+      style: 'currency',
+      currency: 'BRL',
+    })
+  }
+
+  /** Formata uma data ISO vinda da API. */
+  public formatDate(iso: string | null | undefined): string {
+    if (!iso) return '—'
+    const date = new Date(iso)
+    if (isNaN(date.getTime())) return '—'
+    return date.toLocaleDateString('pt-BR')
+  }
+
+  public formatDateTime(iso: string | null | undefined): string {
+    if (!iso) return '—'
+    const date = new Date(iso)
+    if (isNaN(date.getTime())) return '—'
+    return date.toLocaleString('pt-BR', {
+      day: '2-digit', month: '2-digit', year: 'numeric',
+      hour: '2-digit', minute: '2-digit',
+    })
+  }
+
+  /** "3 dias, 4h 12m" até a data informada; string vazia se já passou. */
+  public countdownTo(iso: string | null | undefined): string {
+    if (!iso) return ''
+    const target = new Date(iso).getTime()
+    const diff = target - Date.now()
+    if (isNaN(target) || diff <= 0) return ''
+
+    const totalSeconds = Math.floor(diff / 1000)
+    const days = Math.floor(totalSeconds / 86400)
+    const hours = Math.floor((totalSeconds % 86400) / 3600)
+    const minutes = Math.floor((totalSeconds % 3600) / 60)
+
+    if (days > 0) return `${days} ${days === 1 ? 'dia' : 'dias'} e ${hours}h`
+    if (hours > 0) return `${hours}h ${minutes}m`
+    return `${minutes} min`
   }
 
   public async message(message: string, time: number, color: string) {
@@ -52,8 +133,24 @@ export class HelperService {
     toast.present();
   }
 
-  public async goToPage(route: string) {
-    await this.router.navigate([route], { skipLocationChange: true });
+  /**
+   * Navega para uma rota.
+   *
+   * O `skipLocationChange: true` que existia aqui impedia a URL da barra de
+   * endereços de mudar: nenhuma tela tinha link próprio, o botão voltar do
+   * navegador não funcionava e recarregar a página jogava o usuário de volta
+   * ao login. Com telas no lugar dos modais, isso passou a ser essencial.
+   */
+  public async goToPage(route: string, extras?: NavigationExtras) {
+    await this.router.navigate([route], extras);
+  }
+
+  public async goBack(fallback: string = '/home') {
+    if (window.history.length > 1) {
+      this.location.back();
+      return;
+    }
+    await this.goToPage(fallback);
   }
 
   public async disableLoader() {

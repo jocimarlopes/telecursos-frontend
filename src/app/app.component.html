@@ -1,6 +1,9 @@
 <ion-app>
-  <ion-router-outlet *ngIf="!certificado && !waiting"></ion-router-outlet>
-  <ion-content *ngIf="certificado">
-    <img [src]="certificado" class="certificado" alt="Certificado" />
+  <ion-router-outlet *ngIf="ready"></ion-router-outlet>
+
+  <ion-content *ngIf="!ready" class="tc-page">
+    <div class="tc-boot">
+      <ion-spinner name="crescent" color="primary"></ion-spinner>
+    </div>
   </ion-content>
 </ion-app>

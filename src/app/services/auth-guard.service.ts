@@ -1,50 +1,68 @@
 import { Injectable } from '@angular/core';
-import { ActivatedRouteSnapshot } from '@angular/router';
-import { jwtDecode } from 'jwt-decode';
-import { UserService } from './user.service';
+import { CanActivate, Router, UrlTree } from '@angular/router';
 import { HelperService } from './helper.service';
+import { UserService } from './user.service';
 
-@Injectable({
-  providedIn: 'root'
-})
-export class AuthGuardService {
+/**
+ * Guarda das rotas autenticadas.
+ *
+ * Corrige dois problemas da versão anterior:
+ *
+ * 1. Checava `token_data['data']['id']`, mas o backend sempre devolveu `uid`.
+ *    A condição nunca era satisfeita — o guard reprovaria qualquer usuário.
+ *    Passava despercebido porque não estava registrado em nenhuma rota.
+ * 2. Não estava aplicado. As páginas internas eram acessíveis sem login;
+ *    quebravam ao chamar a API, mas ficavam visíveis.
+ */
+@Injectable({ providedIn: 'root' })
+export class AuthGuardService implements CanActivate {
 
   constructor(
     private helper: HelperService,
-    private user: UserService
+    private user: UserService,
+    private router: Router,
   ) { }
 
-  // Verify if token is valid or expired
-  canActivate(route?: ActivatedRouteSnapshot): Promise<boolean> {
-    const token = localStorage.getItem('token')
-    return this.verifyCanActivate(token, route)
-  }
+  canActivate(): boolean | UrlTree {
+    const token = localStorage.getItem('token');
 
-  async verifyCanActivate(token: string|null, route?: any) {
     if (!token) {
-      this.goToLogin('Você não está logado, faça login para continuar')
-      return false;
+      return this.reject('Faça login para continuar');
     }
-    const token_data: any = jwtDecode(token)
-    const expires = (token_data['exp'] * 1000) - Date.now()
 
-    if(!token_data['data']['id']) {
-      this.goToLogin('Erro de usuário, faça login novamente')
-      return false
+    if (!this.helper.tokenIsValid(token)) {
+      return this.reject('Sua sessão expirou. Entre novamente.');
     }
-    if (!expires || isNaN(expires) || expires < 1) {
-      this.goToLogin('sua sessão expirou, faça login novamente')
-      return false;
-    }
+
     return true;
   }
 
-  async goToLogin(message?: string) {
-    this.user.resetarUsuario()
-    if (message) this.helper.message(message, 2400, 'warning')
-    this.helper.goToPage('')
+  private reject(message: string): UrlTree {
+    this.user.clearSession();
+    this.helper.message(message, 2400, 'warning');
+    return this.router.parseUrl('/entrar');
   }
+}
 
+/** Restringe o painel administrativo a usuários com role de admin. */
+@Injectable({ providedIn: 'root' })
+export class AdminGuardService implements CanActivate {
 
+  constructor(
+    private helper: HelperService,
+    private user: UserService,
+    private router: Router,
+    private authGuard: AuthGuardService,
+  ) { }
 
+  canActivate(): boolean | UrlTree {
+    const authenticated = this.authGuard.canActivate();
+    if (authenticated !== true) return authenticated;
+
+    if (this.user.getUserData()?.role !== 'admin') {
+      this.helper.message('Área restrita a administradores', 2400, 'danger');
+      return this.router.parseUrl('/home');
+    }
+    return true;
+  }
 }

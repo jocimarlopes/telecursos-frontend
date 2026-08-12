@@ -1,70 +1,81 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { environment } from 'src/environments/environment';
-import { map } from 'rxjs/operators';
 import { Observable } from 'rxjs';
+import { environment } from 'src/environments/environment';
 
-@Injectable({
-  providedIn: 'root'
-})
+/**
+ * Cliente HTTP da API.
+ *
+ * O backend antigo recebia os dados como JSON em base64 no header
+ * `Authorization`, o que impedia inspecionar requisições no DevTools e
+ * estourava o tamanho do header em payloads maiores. As rotas novas usam corpo
+ * JSON normal. Os métodos legados (`postWithToken` e afins) continuam aqui
+ * porque as rotas antigas do backend ainda os aceitam durante a transição.
+ */
+@Injectable({ providedIn: 'root' })
 export class ApiService {
 
-  token: any = ''
+  constructor(private http: HttpClient) { }
 
-  constructor(
-    private http: HttpClient,
-    ) { }
-
-
-  get(urlWithParams: string) {
-    return this.http.get(urlWithParams).pipe(map((res: any) => res));
+  private url(path: string): string {
+    return `${environment.API_URL}/${path.replace(/^\//, '')}`;
   }
 
-  postLogin(credentials: any) {
-    const basic = btoa(`${credentials.email}:${credentials.password}`)
-    const headers = new HttpHeaders({ "Content-Type": "application/json" , "Authorization": "Basic " + basic})
-    return this.http.post(`${environment.API_URL}/login`, {}, { headers: headers}).pipe(map((res: any) => res));
+  private headers(token?: string | null): HttpHeaders {
+    let headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+    if (token) headers = headers.set('Token', token);
+    return headers;
   }
 
-  postWithoutToken(url: string, dados: any) {
-    const headers = new HttpHeaders({ "Content-Type": "application/json" , "Authorization": "Bearer " + btoa(JSON.stringify(dados))})
-    return this.http.post(`${environment.API_URL}/${url}`, {}, { headers: headers}).pipe(map((res: any) => res));
+  get<T = any>(path: string, token?: string | null): Observable<T> {
+    return this.http.get<T>(this.url(path), { headers: this.headers(token) });
   }
 
-  postWithToken(url: string, dados: any, token: string) {
-    const headers = new HttpHeaders({ 
-      "Authorization": "Bearer " + btoa(encodeURIComponent(JSON.stringify(dados))),
-      "Token": token,
-    })
-    return this.http.post(`${environment.API_URL}/${url}`, {}, { headers: headers}).pipe(map((res: any) => res));
+  post<T = any>(path: string, body: any = {}, token?: string | null): Observable<T> {
+    return this.http.post<T>(this.url(path), body, { headers: this.headers(token) });
   }
 
-  postWithTokenBlob(url: string, dados: any, token: string) {
-    const headers = new HttpHeaders({ 
-      "Authorization": "Bearer " + btoa(encodeURIComponent(JSON.stringify(dados))),
-      "Token": token,
-    })
-    return this.http.post(`${environment.API_URL}/${url}`, {}, { headers: headers, responseType: 'blob'}).pipe(map((res: any) => res));
+  put<T = any>(path: string, body: any = {}, token?: string | null): Observable<T> {
+    return this.http.put<T>(this.url(path), body, { headers: this.headers(token) });
   }
 
-  refreshToken(token: string) {
-    const headers = new HttpHeaders({ 
-      "Token": token,
-    })
-    return this.http.post(`${environment.API_URL}/refresh_token`, {}, { headers: headers}).pipe(map((res: any) => res)); 
+  delete<T = any>(path: string, token?: string | null): Observable<T> {
+    return this.http.delete<T>(this.url(path), { headers: this.headers(token) });
   }
 
-  postWithoutTokenBlob(url: string, dados: any): Observable<Blob> {
-    const headers = new HttpHeaders({
-      "Content-Type": "application/json",
-      "Authorization": "Bearer " + btoa(JSON.stringify(dados))
+  /** Upload de arquivo (arte do certificado, logo da instituição). */
+  upload<T = any>(path: string, field: string, file: File, token?: string | null): Observable<T> {
+    const form = new FormData();
+    form.append(field, file);
+    // Sem Content-Type: o browser precisa definir o boundary do multipart.
+    let headers = new HttpHeaders();
+    if (token) headers = headers.set('Token', token);
+    return this.http.post<T>(this.url(path), form, { headers });
+  }
+
+  getBlob(path: string, token?: string | null): Observable<Blob> {
+    let headers = new HttpHeaders();
+    if (token) headers = headers.set('Token', token);
+    return this.http.get(this.url(path), { headers, responseType: 'blob' });
+  }
+
+  login(email: string, password: string): Observable<any> {
+    return this.http.post(this.url('login'), { email, password });
+  }
+
+  refreshToken(token: string): Observable<any> {
+    return this.http.post(this.url('refresh_token'), {}, { headers: this.headers(token) });
+  }
+
+  /**
+   * Formato legado: JSON codificado em base64 no header Authorization.
+   * Usado só pelas rotas do backend que ainda não migraram.
+   */
+  postLegacy<T = any>(path: string, data: any, token?: string | null): Observable<T> {
+    let headers = new HttpHeaders({
+      Authorization: 'Bearer ' + btoa(encodeURIComponent(JSON.stringify(data))),
     });
-
-    return this.http.post(`${environment.API_URL}/${url}`, {}, {
-      headers: headers,
-      responseType: 'blob' // <- essencial
-    });
+    if (token) headers = headers.set('Token', token);
+    return this.http.post<T>(this.url(path), {}, { headers });
   }
-
-
 }

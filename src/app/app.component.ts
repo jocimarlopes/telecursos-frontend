@@ -1,8 +1,6 @@
-import { Component } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
-import { ApiService } from './services/api.service';
-import { UserService } from './services/user.service';
-import { HelperService } from './services/helper.service';
+import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
+import { InstitutionService } from './services/institution.service';
 
 @Component({
   selector: 'app-root',
@@ -10,49 +8,56 @@ import { HelperService } from './services/helper.service';
   styleUrls: ['app.component.scss'],
   standalone: false,
 })
-export class AppComponent {
-  certificado: string | null = null;
-  waiting: boolean = false;
+export class AppComponent implements OnInit {
+
+  ready = false;
+
   constructor(
-    private actRoute: ActivatedRoute,
-    private api: ApiService,
-    private user: UserService,
-    private helper: HelperService
-    
-  ) {
-    this.getCertifiedParam()
+    private router: Router,
+    private institution: InstitutionService,
+  ) { }
+
+  ngOnInit() {
+    this.redirectLegacyCertificateLink();
+    this.bootstrapTenant();
   }
 
-  verifyCertified() {
-    setTimeout(() => {
-      if(!this.certificado) this.user.setCertified(false);
-    }, 1500);
+  /**
+   * Os QR Codes já impressos apontam para `cursando.pro/?c=<codigo>`.
+   * A versão anterior baixava um JPG do certificado e o jogava na tela, sem
+   * dizer se era válido, de quem era ou quantas horas tinha. Agora redireciona
+   * para a página de validação, que mostra os dados e o selo de autenticidade.
+   */
+  private redirectLegacyCertificateLink() {
+    const code = new URLSearchParams(window.location.search).get('c');
+    if (code) {
+      this.router.navigate(['/validar', code], { replaceUrl: true });
+    }
   }
 
-  getCertifiedParam() {
-    this.actRoute.queryParams.subscribe(async params => {
-      if (params['c']) {
-        this.user.setCertified(true);
-        this.waiting = true;
-        await this.helper.loader('Verificando autenticidade do certificado...')
-        this.api.postWithoutTokenBlob('validate', { code: params['c'] }).subscribe({
-          next: async (data: any) => {
-            this.verifyCertified()
-            this.waiting = false;
-            await this.helper.closeLoader()
-            const url = URL.createObjectURL(data);
-            this.certificado = url;            
-            this.helper.message('Certificado verificado com sucesso!', 5000, 'success');
-          },
-          error: async (err) => { 
-            this.verifyCertified()
-            this.waiting = false;
-            await this.helper.closeLoader() 
-            console.error('Erro ao obter certificado:', err);
-          }
-        });
-      }
+  /**
+   * Num subdomínio de instituição, carrega a marca dela e leva direto para a
+   * validação — é a única coisa que o subdomínio faz.
+   */
+  private bootstrapTenant() {
+    if (!this.institution.isTenant) {
+      this.ready = true;
+      return;
+    }
+
+    this.institution.load().subscribe({
+      next: (institution) => {
+        this.ready = true;
+        if (institution && this.isAtRoot()) {
+          this.router.navigate(['/validar'], { replaceUrl: true });
+        }
+      },
+      error: () => { this.ready = true; },
     });
   }
 
+  private isAtRoot(): boolean {
+    const path = window.location.pathname.replace(/\/+$/, '');
+    return path === '' || path === '/';
+  }
 }
