@@ -1,0 +1,14 @@
+<span class="tc-tag tc-tag--issued" *ngIf="state === 'issued'">
+  <ion-icon name="ribbon-outline"></ion-icon>
+  Certificado emitido
+</span>
+
+<span class="tc-tag tc-tag--waiting" *ngIf="state === 'pending-payment'">
+  <ion-icon name="hourglass-outline"></ion-icon>
+  Aguardando pagamento
+</span>
+
+<span class="tc-tag tc-tag--ready" *ngIf="state === 'available'">
+  <ion-icon name="ribbon-outline"></ion-icon>
+  Certificado disponível
+</span>

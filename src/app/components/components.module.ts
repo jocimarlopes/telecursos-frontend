@@ -1,30 +1,34 @@
-import { CUSTOM_ELEMENTS_SCHEMA, NgModule, NO_ERRORS_SCHEMA } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { CourseDetailsComponent } from './course-details/course-details.component';
+import { NgModule } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import { IonicModule } from '@ionic/angular';
-import { WelcomeComponent } from './welcome/welcome.component';
-import { TutorialTorrentComponent } from './tutorial-torrent/tutorial-torrent.component';
 
+import { AppHeaderComponent } from './app-header/app-header.component';
+import { CertificateStatusComponent } from './certificate-status/certificate-status.component';
+import { CoverImageComponent } from './cover-image/cover-image.component';
 
-
+/**
+ * Componentes compartilhados.
+ *
+ * CourseDetailsComponent, WelcomeComponent e TutorialTorrentComponent saíram
+ * daqui: viraram páginas com rota própria (/curso/:ref, /bem-vindo,
+ * /como-acessar).
+ */
 @NgModule({
   declarations: [
-    CourseDetailsComponent,
-    WelcomeComponent,
-    TutorialTorrentComponent
+    AppHeaderComponent,
+    CertificateStatusComponent,
+    CoverImageComponent,
   ],
   imports: [
     CommonModule,
-    IonicModule
+    FormsModule,
+    IonicModule,
   ],
   exports: [
-    CourseDetailsComponent,
-    WelcomeComponent,
-    TutorialTorrentComponent
+    AppHeaderComponent,
+    CertificateStatusComponent,
+    CoverImageComponent,
   ],
-  schemas: [
-    NO_ERRORS_SCHEMA,
-    CUSTOM_ELEMENTS_SCHEMA
-  ]
 })
 export class ComponentsModule { }

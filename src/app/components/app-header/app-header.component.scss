@@ -1,0 +1,18 @@
+.tc-toolbar__title {
+  font-size: var(--tc-text-md);
+  font-weight: 700;
+  padding-inline: 0;
+}
+
+.tc-toolbar__link {
+  --color: var(--tc-ink-soft);
+  font-size: var(--tc-text-sm);
+  font-weight: 700;
+  text-transform: none;
+}
+
+/* Em telas estreitas fica só o ícone — o rótulo empurraria o menu de conta
+   para fora da barra. */
+@media (max-width: 560px) {
+  .tc-toolbar__link-text { display: none; }
+}

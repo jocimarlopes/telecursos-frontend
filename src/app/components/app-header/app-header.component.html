@@ -1,0 +1,32 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar class="tc-toolbar">
+
+    <ion-buttons slot="start" *ngIf="back">
+      <ion-button (click)="goBack()" fill="clear" aria-label="Voltar">
+        <ion-icon name="arrow-back-outline" slot="icon-only"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+
+    <div class="tc-brand" *ngIf="!back" (click)="goHome()" role="button" tabindex="0"
+         (keydown.enter)="goHome()">
+      <img class="tc-brand__logo" src="assets/logo.png" alt="">
+      <span class="tc-brand__name">Cursando.Pro</span>
+    </div>
+
+    <ion-title *ngIf="back" class="tc-toolbar__title">{{ title }}</ion-title>
+
+    <ion-buttons slot="end" *ngIf="!bare">
+      <!-- Escondido quando já estamos em Meus cursos: o atalho repetiria o
+           título da própria página. -->
+      <ion-button *ngIf="!onMyCourses" (click)="goMyCourses()" fill="clear"
+                  class="tc-toolbar__link">
+        <ion-icon name="library-outline" slot="start"></ion-icon>
+        <span class="tc-toolbar__link-text">Meus cursos</span>
+      </ion-button>
+      <ion-button (click)="goProfile()" fill="clear" aria-label="Minha conta">
+        <ion-icon name="person-circle-outline" slot="icon-only"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+
+  </ion-toolbar>
+</ion-header>

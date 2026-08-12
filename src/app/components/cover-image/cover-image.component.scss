@@ -1,0 +1,46 @@
+:host {
+  display: block;
+  width: 100%;
+}
+
+.cover {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  border-radius: var(--tc-radius-sm);
+  background: var(--tc-surface-sunken);
+}
+
+/* O fallback ocupa exatamente a mesma caixa da imagem, então a linha não
+   muda de altura quando uma capa falha. */
+.cover--fallback {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: var(--tc-space-2);
+  text-align: center;
+  border: 1px solid var(--tc-line);
+  background: linear-gradient(135deg, var(--tc-surface-sunken), var(--tc-brand-soft));
+  overflow: hidden;
+}
+
+.cover__initials {
+  font-size: var(--tc-text-lg);
+  font-weight: 700;
+  line-height: 1;
+  color: var(--tc-brand);
+}
+
+.cover__title {
+  font-size: 10px;
+  line-height: 1.25;
+  font-weight: 700;
+  color: var(--tc-ink-soft);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}

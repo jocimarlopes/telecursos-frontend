@@ -1,0 +1,13 @@
+<!-- alt vazio: o título já aparece ao lado, e repetir aqui faz o leitor de
+     tela anunciar a mesma coisa duas vezes -->
+<img *ngIf="!showFallback"
+     class="cover"
+     [src]="src"
+     alt=""
+     loading="lazy"
+     (error)="onError()">
+
+<div *ngIf="showFallback" class="cover cover--fallback" aria-hidden="true">
+  <span class="cover__initials">{{ initials }}</span>
+  <span class="cover__title">{{ title }}</span>
+</div>
