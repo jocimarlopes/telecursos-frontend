@@ -18,7 +18,11 @@ export class ApiService {
   constructor(private http: HttpClient) { }
 
   private url(path: string): string {
-    return `${environment.API_URL}/${path.replace(/^\//, '')}`;
+    // Tolera barra sobrando dos dois lados: com API_URL terminando em "/" o
+    // resultado sairia com "//" no meio, e alguns servidores tratam isso como
+    // outra rota.
+    const base = environment.API_URL.replace(/\/+$/, '');
+    return `${base}/${path.replace(/^\/+/, '')}`;
   }
 
   private headers(token?: string | null): HttpHeaders {
