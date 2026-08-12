@@ -57,6 +57,56 @@
     </div>
   </section>
 
+  <!-- Esteira de cursos: prova de catálogo real, não um enfeite de estoque.
+       O conteúdo em movimento é decorativo (aria-hidden) — a mesma ação de
+       cada cartão já existe, acessível, no botão abaixo e no cabeçalho. -->
+  <section class="landing__showcase" *ngIf="hasShowcase">
+    <div class="tc-container landing__showcase-head">
+      <span class="tc-eyebrow">Catálogo</span>
+      <h2 class="landing__showcase-title">Cursos que já estão rodando na plataforma</h2>
+      <p class="landing__lead landing__showcase-lead">
+        Uma amostra do catálogo real — todos com certificado incluso na assinatura.
+      </p>
+    </div>
+
+    <ng-template #courseCard let-course="course">
+      <div class="landing__card">
+        <div class="landing__card-media">
+          <cover-image class="landing__card-cover" [src]="course.image" [title]="course.name"></cover-image>
+          <span class="landing__card-stamp">
+            <ion-icon name="ribbon-outline"></ion-icon>
+            Com certificado
+          </span>
+        </div>
+        <div class="landing__card-face">
+          <h3 class="landing__card-title">{{ course.name }}</h3>
+          <p class="landing__card-desc">
+            {{ course.little_description || 'Curso completo, direto da plataforma.' }}
+          </p>
+        </div>
+      </div>
+    </ng-template>
+
+    <div class="landing__belt" aria-hidden="true">
+      <ul class="landing__lane landing__lane--a">
+        <li *ngFor="let course of laneA; trackBy: trackByCourse">
+          <ng-container *ngTemplateOutlet="courseCard; context: { course: course }"></ng-container>
+        </li>
+      </ul>
+      <ul class="landing__lane landing__lane--b">
+        <li *ngFor="let course of laneB; trackBy: trackByCourse">
+          <ng-container *ngTemplateOutlet="courseCard; context: { course: course }"></ng-container>
+        </li>
+      </ul>
+    </div>
+
+    <div class="tc-container landing__showcase-cta">
+      <ion-button class="tc-btn" fill="outline" (click)="go('/cadastrar')">
+        Criar conta e ver o catálogo completo
+      </ion-button>
+    </div>
+  </section>
+
   <footer class="landing__footer">
     <div class="tc-container">
       <p>Cursando.Pro · Plataforma de cursos profissionalizantes</p>

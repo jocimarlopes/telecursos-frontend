@@ -76,3 +76,184 @@
   color: var(--tc-ink-faint);
   margin: 0;
 }
+
+/* =============================================================================
+   Esteira de cursos
+   =============================================================================
+
+   Duas faixas horizontais que giram em sentidos opostos, como um rolo de
+   esteira — a metáfora certa para "cursos que já estão rodando na plataforma".
+   Cada faixa vem duplicada no componente (laneA/laneB) e a animação translada
+   50%: como as duas metades são idênticas, o ponto de corte é invisível.
+
+   O conteúdo em movimento é decorativo (aria-hidden no HTML) — nenhum cartão
+   é focável. Um alvo em movimento não deve ser a única forma de alcançar uma
+   ação; o botão abaixo da esteira e o cabeçalho já cobrem a mesma ação de
+   forma parada e acessível.
+   ========================================================================= */
+
+.landing__showcase {
+  padding: var(--tc-space-7) 0 var(--tc-space-6);
+  border-bottom: 1px solid var(--tc-line);
+  overflow: hidden;
+}
+
+.landing__showcase-head {
+  margin-bottom: var(--tc-space-5);
+}
+
+.landing__showcase-title {
+  font-size: clamp(22px, 4vw, var(--tc-text-2xl));
+  margin: var(--tc-space-2) 0 var(--tc-space-1);
+  max-width: 32ch;
+}
+
+.landing__showcase-lead {
+  margin: 0;
+  max-width: 48ch;
+}
+
+.landing__showcase-cta {
+  margin-top: var(--tc-space-6);
+  display: flex;
+  justify-content: center;
+}
+
+.landing__belt {
+  display: flex;
+  flex-direction: column;
+  gap: var(--tc-space-4);
+  padding: var(--tc-space-2) 0;
+  /* Esmaece as duas pontas — a esteira parece continuar para fora da tela em
+     vez de ser cortada a régua. */
+  mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
+}
+
+.landing__belt:hover .landing__lane {
+  animation-play-state: paused;
+}
+
+.landing__lane {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--tc-space-4);
+  width: max-content;
+  list-style: none;
+  margin: 0;
+  padding: var(--tc-space-1) 0;
+  animation-name: landing-marquee;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+
+.landing__lane--a { animation-duration: 46s; }
+.landing__lane--b { animation-duration: 38s; animation-direction: reverse; }
+
+.landing__lane > li {
+  flex: 0 0 auto;
+  width: 240px;
+}
+
+@keyframes landing-marquee {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+
+.landing__card {
+  background: var(--tc-surface);
+  border: 1px solid var(--tc-line);
+  border-radius: var(--tc-radius);
+  overflow: hidden;
+  box-shadow: var(--tc-shadow-card);
+  transition: transform 0.28s ease, box-shadow 0.28s ease, border-color 0.28s ease;
+}
+
+.landing__card:hover {
+  transform: translateY(-6px) scale(1.02);
+  box-shadow: var(--tc-shadow-lift);
+  border-color: var(--tc-line-strong);
+}
+
+.landing__card-media {
+  position: relative;
+}
+
+/* O selo de autenticidade é verde só quando algo foi verificado — aqui ele
+   marca que o curso inclui certificado, a mesma regra de cor do resto do
+   produto. Some por padrão e "estampa" ao passar o mouse, com uma pequena
+   ultrapassagem na curva para lembrar um selo de cera caindo sobre o papel. */
+.landing__card-stamp {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 5px 10px 5px 8px;
+  border-radius: 999px;
+  background: var(--tc-seal);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  white-space: nowrap;
+  box-shadow: var(--tc-shadow-card);
+  opacity: 0;
+  transform: translate(10%, -35%) rotate(-16deg) scale(0.5);
+  transition: transform 0.32s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.22s ease;
+}
+
+.landing__card-stamp ion-icon {
+  font-size: 13px;
+}
+
+.landing__card:hover .landing__card-stamp {
+  opacity: 1;
+  transform: translate(0, 0) rotate(-8deg) scale(1);
+}
+
+.landing__card-face {
+  padding: var(--tc-space-3);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  /* Altura fixa reservando o espaço da descrição: a revelação no hover troca
+     opacidade, nunca layout — nenhum cartão vizinho pula quando este cresce. */
+  min-height: 96px;
+}
+
+.landing__card-title {
+  font-size: var(--tc-text-sm);
+  font-weight: 700;
+  margin: 0;
+  color: var(--tc-ink);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.landing__card-desc {
+  font-size: var(--tc-text-xs);
+  line-height: 1.4;
+  color: var(--tc-ink-faint);
+  margin: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  opacity: 0;
+  transform: translateY(4px);
+  transition: opacity 0.25s ease, transform 0.25s ease;
+}
+
+.landing__card:hover .landing__card-desc {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .landing__lane {
+    animation: none;
+  }
+}
