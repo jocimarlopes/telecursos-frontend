@@ -1,0 +1,135 @@
+<ion-content class="tc-page">
+  <div class="tc-container tc-container--narrow validate">
+
+    <!-- Cabeçalho da instituição emissora -->
+    <header class="validate__head">
+      <img *ngIf="institution?.has_logo"
+           class="validate__logo"
+           [src]="institutions.logoUrl(institution!.slug)"
+           [alt]="institution!.name">
+      <img *ngIf="!institution" class="validate__logo" src="assets/logo.png" alt="Cursando.Pro">
+
+      <span class="tc-eyebrow">{{ brandName }}</span>
+      <h1 class="validate__title">Verificação de certificado</h1>
+      <p class="validate__lead">
+        Digite o código impresso no certificado para confirmar sua autenticidade.
+      </p>
+    </header>
+
+    <!-- Busca -->
+    <form class="validate__form" *ngIf="!result || !result.valid" (ngSubmit)="submit()">
+      <label class="tc-label" for="codigo">Código de verificação</label>
+      <ion-item lines="none" class="tc-field">
+        <ion-input id="codigo"
+                   [value]="code"
+                   (ionInput)="onCodeInput($event)"
+                   placeholder="ABCD-2345-EFGH"
+                   autocapitalize="characters"
+                   autocomplete="off"
+                   spellcheck="false"
+                   class="validate__input"></ion-input>
+      </ion-item>
+      <ion-button type="submit" expand="block" class="tc-btn" [disabled]="loading">
+        <ion-spinner *ngIf="loading" name="crescent" slot="start"></ion-spinner>
+        {{ loading ? 'Verificando…' : 'Verificar certificado' }}
+      </ion-button>
+    </form>
+
+    <!-- Resultado -->
+    <section class="validate__result" *ngIf="result && !loading" aria-live="polite">
+
+      <!-- Autêntico -->
+      <ng-container *ngIf="result.valid">
+        <div class="tc-stamp">
+          <ion-icon class="tc-stamp__icon" name="shield-checkmark"></ion-icon>
+          <span class="tc-stamp__label">Certificado<br>autêntico</span>
+        </div>
+
+        <div class="tc-card validate__card">
+          <div class="tc-card__body">
+            <dl class="tc-defs tc-defs--2col">
+              <div>
+                <p class="tc-def__label">Aluno</p>
+                <p class="tc-def__value">{{ result.student_name }}</p>
+              </div>
+              <div>
+                <p class="tc-def__label">Carga horária</p>
+                <p class="tc-def__value">{{ result.workload_hours }} horas</p>
+              </div>
+              <div class="validate__wide">
+                <p class="tc-def__label">Curso</p>
+                <p class="tc-def__value">{{ result.course_title }}</p>
+              </div>
+              <div>
+                <p class="tc-def__label">Instituição emissora</p>
+                <p class="tc-def__value">{{ result.institution?.name }}</p>
+              </div>
+              <div>
+                <p class="tc-def__label">Conclusão</p>
+                <p class="tc-def__value">{{ helper.formatDate(result.completed_at) }}</p>
+              </div>
+              <div class="validate__wide">
+                <p class="tc-def__label">Código de verificação</p>
+                <span class="tc-code">{{ result.verification_code }}</span>
+              </div>
+            </dl>
+
+            <ion-button expand="block" fill="outline" class="tc-btn validate__download"
+                        (click)="download()">
+              <ion-icon name="download-outline" slot="start"></ion-icon>
+              Baixar o certificado em PDF
+            </ion-button>
+          </div>
+        </div>
+
+        <ion-button fill="clear" size="small" (click)="reset()">
+          Verificar outro certificado
+        </ion-button>
+      </ng-container>
+
+      <!-- Não autêntico -->
+      <ng-container *ngIf="!result.valid && searched">
+        <div class="tc-stamp"
+             [class.tc-stamp--waiting]="result.reason === 'pending'"
+             [class.tc-stamp--invalid]="result.reason !== 'pending'">
+          <ion-icon class="tc-stamp__icon"
+                    [name]="result.reason === 'pending' ? 'hourglass' : 'close-circle'"></ion-icon>
+          <span class="tc-stamp__label">
+            {{ result.reason === 'revoked' ? 'Certificado revogado'
+             : result.reason === 'pending' ? 'Não liberado'
+             : 'Não localizado' }}
+          </span>
+        </div>
+
+        <div class="tc-card validate__card">
+          <div class="tc-card__body validate__negative">
+            <p class="validate__message">{{ result.message }}</p>
+
+            <p class="validate__reason" *ngIf="result.revoked_reason">
+              <strong>Motivo:</strong> {{ result.revoked_reason }}
+            </p>
+
+            <dl class="tc-defs" *ngIf="result.student_name">
+              <div>
+                <p class="tc-def__label">Constava como</p>
+                <p class="tc-def__value">{{ result.student_name }} — {{ result.course_title }}</p>
+              </div>
+            </dl>
+
+            <p class="validate__hint" *ngIf="result.reason === 'not_found'">
+              Confira se o código foi digitado corretamente. Ele tem 12 caracteres
+              e aparece abaixo do QR Code do certificado.
+            </p>
+          </div>
+        </div>
+      </ng-container>
+    </section>
+
+    <footer class="validate__footer">
+      <p>
+        Esta verificação consulta diretamente a base da instituição emissora.
+        Certificados emitidos pelo {{ brandName }} têm código único e QR Code.
+      </p>
+    </footer>
+  </div>
+</ion-content>

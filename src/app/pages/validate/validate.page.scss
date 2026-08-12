@@ -1,0 +1,89 @@
+.validate {
+  padding-top: var(--tc-space-7);
+}
+
+.validate__head {
+  text-align: center;
+  margin-bottom: var(--tc-space-6);
+}
+
+.validate__logo {
+  height: 44px;
+  width: auto;
+  margin-bottom: var(--tc-space-4);
+}
+
+.validate__title {
+  font-size: var(--tc-text-2xl);
+  margin: 0 0 var(--tc-space-2);
+}
+
+.validate__lead {
+  color: var(--tc-ink-soft);
+  font-size: var(--tc-text-md);
+  margin: 0 auto;
+  max-width: 42ch;
+}
+
+.validate__form {
+  margin-bottom: var(--tc-space-6);
+}
+
+/* O código é lido de um papel e digitado caractere a caractere. */
+.validate__input {
+  font-family: var(--tc-font-mono);
+  font-size: var(--tc-text-lg);
+  letter-spacing: 0.16em;
+  text-align: center;
+}
+
+.validate__result {
+  text-align: center;
+}
+
+.validate__card {
+  margin: var(--tc-space-6) 0 var(--tc-space-4);
+  text-align: start;
+}
+
+/* Curso e código ocupam a linha inteira: são os campos longos. */
+.validate__wide {
+  grid-column: 1 / -1;
+}
+
+.validate__download {
+  margin-top: var(--tc-space-5);
+}
+
+.validate__negative {
+  text-align: center;
+}
+
+.validate__message {
+  font-size: var(--tc-text-md);
+  color: var(--tc-ink);
+  margin: 0 0 var(--tc-space-3);
+  font-weight: 700;
+}
+
+.validate__reason,
+.validate__hint {
+  font-size: var(--tc-text-sm);
+  color: var(--tc-ink-soft);
+  margin: var(--tc-space-3) 0 0;
+}
+
+.validate__footer {
+  margin-top: var(--tc-space-7);
+  padding-top: var(--tc-space-4);
+  border-top: 1px solid var(--tc-line);
+  text-align: center;
+}
+
+.validate__footer p {
+  font-size: var(--tc-text-xs);
+  color: var(--tc-ink-faint);
+  margin: 0 auto;
+  max-width: 48ch;
+  line-height: 1.6;
+}
