@@ -11,52 +11,67 @@
   </header>
 
   <section class="landing__hero">
-    <div class="tc-container">
-      <span class="tc-eyebrow">Cursos profissionalizantes</span>
-      <h1 class="landing__title">
-        Faça o curso.<br>Receba o certificado que o RH aceita.
-      </h1>
-      <p class="landing__lead">
-        Elétrica, refrigeração, segurança do trabalho, informática e mais.
-        Assinatura mensal com todos os cursos inclusos. O certificado é opcional
-        e sai na hora, com código único e QR Code — o empregador confere a
-        autenticidade em segundos.
-      </p>
-      <div class="landing__cta">
-        <ion-button class="tc-btn" size="large" (click)="go('/cadastrar')">
-          Começar agora
-        </ion-button>
-        <ion-button class="tc-btn" size="large" fill="outline" (click)="go('/entrar')">
-          Já tenho conta
-        </ion-button>
+    <div class="tc-container landing__hero-grid">
+      <div>
+        <span class="tc-eyebrow">Cursos profissionalizantes com certificado</span>
+        <h1 class="landing__title">
+          O curso não muda sua vida.<br>O certificado na entrevista, sim.
+        </h1>
+        <p class="landing__lead">
+          Elétrica, refrigeração, segurança do trabalho, informática e dezenas de
+          outras áreas. Estude quanto quiser e emita o certificado quando precisar
+          — com código único e QR Code que o RH confere em segundos.
+        </p>
+
+        <ul class="landing__points">
+          <li>
+            <ion-icon name="infinite-outline"></ion-icon>
+            <span><strong>Catálogo inteiro liberado</strong> — sem pagar por curso</span>
+          </li>
+          <li>
+            <ion-icon name="flash-outline"></ion-icon>
+            <span><strong>Certificado na hora</strong> — sem esperar prazo nenhum</span>
+          </li>
+          <li>
+            <ion-icon name="shield-checkmark-outline"></ion-icon>
+            <span><strong>Verificável de verdade</strong> — o empregador confirma online</span>
+          </li>
+        </ul>
       </div>
+
+      <!-- Preço no alto: quem chega já sabe quanto custa, sem caçar. -->
+      <aside class="landing__offer">
+        <span class="landing__offer-tag">Assinatura mensal</span>
+
+        <p class="landing__offer-price" *ngIf="priceLabel">
+          <span class="landing__offer-value">{{ priceLabel }}</span>
+          <span class="landing__offer-period">/mês</span>
+        </p>
+        <ion-skeleton-text *ngIf="!priceLabel" animated
+                           class="landing__offer-loading"></ion-skeleton-text>
+
+        <p class="landing__offer-note">
+          Todos os cursos inclusos. Sem fidelidade — você cancela deixando de
+          renovar.
+        </p>
+
+        <ion-button expand="block" class="tc-btn" size="large" (click)="go('/cadastrar')">
+          Criar minha conta
+        </ion-button>
+
+        <p class="landing__offer-fine" *ngIf="certificatePriceLabel">
+          Certificado é opcional, {{ certificatePriceLabel }} por emissão — você
+          só paga quando quiser o documento.
+        </p>
+
+        <button type="button" class="landing__offer-login" (click)="go('/entrar')">
+          Já tenho conta
+        </button>
+      </aside>
     </div>
   </section>
 
   <!-- Verificação em destaque: é o diferencial do produto, não um rodapé -->
-  <section class="landing__verify">
-    <div class="tc-container tc-container--narrow">
-      <div class="tc-card">
-        <div class="tc-card__body landing__verify-body">
-          <ion-icon class="landing__verify-icon" name="shield-checkmark-outline"></ion-icon>
-          <div class="landing__verify-text">
-            <h2 class="tc-card__title">Recebeu um certificado e quer conferir?</h2>
-            <p class="tc-card__meta">
-              Digite o código impresso no documento. Não precisa de conta.
-            </p>
-          </div>
-          <form class="landing__verify-form" (ngSubmit)="validate()">
-            <ion-item lines="none" class="tc-field landing__verify-field">
-              <ion-input placeholder="ABCD-2345-EFGH" [(ngModel)]="code" name="code"
-                         autocapitalize="characters" autocomplete="off"></ion-input>
-            </ion-item>
-            <ion-button type="submit" class="tc-btn">Verificar</ion-button>
-          </form>
-        </div>
-      </div>
-    </div>
-  </section>
-
   <!-- Esteira de cursos: prova de catálogo real, não um enfeite de estoque.
        O conteúdo em movimento é decorativo (aria-hidden) — a mesma ação de
        cada cartão já existe, acessível, no botão abaixo e no cabeçalho. -->
@@ -104,6 +119,81 @@
       <ion-button class="tc-btn" fill="outline" (click)="go('/cadastrar')">
         Criar conta e ver o catálogo completo
       </ion-button>
+    </div>
+  </section>
+
+  <!-- Três passos reais do produto — a ordem aqui é a ordem que a pessoa vive,
+       por isso a numeração faz sentido neste bloco. -->
+  <section class="landing__steps">
+    <div class="tc-container">
+      <h2 class="landing__steps-title">Do zero ao certificado na mão</h2>
+
+      <ol class="landing__steps-list">
+        <li>
+          <span class="landing__step-num">1</span>
+          <h3 class="landing__step-title">Assine e libere tudo</h3>
+          <p class="landing__step-text">
+            Uma mensalidade, catálogo inteiro. Comece pelo curso que resolve o
+            seu problema agora.
+          </p>
+        </li>
+        <li>
+          <span class="landing__step-num">2</span>
+          <h3 class="landing__step-title">Estude no seu ritmo</h3>
+          <p class="landing__step-text">
+            Sem turma, sem horário, sem prazo para terminar. Volte quantas vezes
+            precisar.
+          </p>
+        </li>
+        <li>
+          <span class="landing__step-num">3</span>
+          <h3 class="landing__step-title">Emita quando precisar</h3>
+          <p class="landing__step-text">
+            O certificado sai na hora, com carga horária, código único e QR Code
+            de verificação.
+          </p>
+        </li>
+      </ol>
+    </div>
+  </section>
+
+  <section class="landing__close">
+    <div class="tc-container tc-container--narrow">
+      <h2 class="landing__close-title">
+        A vaga não espera você terminar de pensar.
+      </h2>
+      <p class="landing__close-text" *ngIf="priceLabel">
+        {{ priceLabel }} por mês, todos os cursos inclusos, sem fidelidade.
+      </p>
+      <ion-button class="tc-btn" size="large" (click)="go('/cadastrar')">
+        Criar minha conta
+      </ion-button>
+    </div>
+  </section>
+
+  <!-- Verificação de certificado: fica no fim de propósito. Quem usa isto é o
+       empregador conferindo um documento, não quem está decidindo assinar —
+       no meio da página cortava o fluxo de quem veio pelo anúncio. -->
+  <section class="landing__verify">
+    <div class="tc-container tc-container--narrow">
+      <div class="tc-card">
+        <div class="tc-card__body landing__verify-body">
+          <ion-icon class="landing__verify-icon" name="shield-checkmark-outline"></ion-icon>
+          <div class="landing__verify-text">
+            <h2 class="tc-card__title">Recebeu um certificado e quer conferir?</h2>
+            <p class="tc-card__meta">
+              Digite o código impresso no documento. Não precisa de conta.
+            </p>
+          </div>
+          <form class="landing__verify-form" (ngSubmit)="validate()">
+            <ion-item lines="none" class="tc-field landing__verify-field">
+              <ion-input placeholder="ABCD-2345-EFGH" [(ngModel)]="code" name="code"
+                         autocapitalize="characters" autocomplete="off"></ion-input>
+            </ion-item>
+            <ion-button type="submit" class="tc-btn">Verificar</ion-button>
+          </form>
+        </div>
+      </div>
     </div>
   </section>
 

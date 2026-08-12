@@ -35,9 +35,14 @@ export class LandingPage implements OnInit {
   laneA: ShowcaseCourse[] = [];
   laneB: ShowcaseCourse[] = [];
 
+  /** Preços vindos do servidor — a landing nunca escreve valor no HTML. */
+  priceCents = 0;
+  certificatePriceCents = 0;
+  courseCount = 0;
+
   constructor(
     private api: ApiService,
-    private helper: HelperService,
+    public helper: HelperService,
     private user: UserService,
   ) { }
 
@@ -48,6 +53,33 @@ export class LandingPage implements OnInit {
       return;
     }
     this.loadShowcase();
+    this.loadPricing();
+  }
+
+  /**
+   * O preço anunciado vem da mesma constante que cobra no checkout.
+   *
+   * Escrever "R$ 49,90" no HTML pareceria mais simples, mas já houve um caso
+   * de valor divulgado divergindo do cobrado — e numa landing pública esse
+   * erro vira reclamação de propaganda enganosa, não só bug.
+   */
+  private loadPricing() {
+    this.api.get('api/pricing').subscribe({
+      next: (res: any) => {
+        this.priceCents = res.premium_price_cents ?? 0;
+        this.certificatePriceCents = res.certificate_price_cents ?? 0;
+      },
+      error: () => { this.priceCents = 0; },
+    });
+  }
+
+  get priceLabel(): string {
+    return this.priceCents ? this.helper.formatMoney(this.priceCents) : '';
+  }
+
+  get certificatePriceLabel(): string {
+    return this.certificatePriceCents
+      ? this.helper.formatMoney(this.certificatePriceCents) : '';
   }
 
   private loadShowcase() {
@@ -56,6 +88,7 @@ export class LandingPage implements OnInit {
         const courses: ShowcaseCourse[] = res.courses || [];
         // Intercala em duas listas para as esteiras não mostrarem sempre a
         // mesma dupla de cursos alinhada uma sobre a outra.
+        this.courseCount = courses.length;
         const a = courses.filter((_, i) => i % 2 === 0);
         const b = courses.filter((_, i) => i % 2 === 1);
         this.laneA = [...a, ...a];

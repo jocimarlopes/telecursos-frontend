@@ -20,24 +20,135 @@
   border-bottom: 1px solid var(--tc-line);
 }
 
+/* Texto e oferta lado a lado no desktop; empilhados no celular, com a oferta
+   logo abaixo da promessa — o preço nunca fica escondido no fim da página. */
+.landing__hero-grid {
+  display: grid;
+  gap: var(--tc-space-6);
+  align-items: start;
+}
+
+@media (min-width: 900px) {
+  .landing__hero-grid { grid-template-columns: minmax(0, 1fr) 340px; }
+}
+
 .landing__title {
   font-size: clamp(28px, 6vw, var(--tc-text-3xl));
   margin: 0 0 var(--tc-space-4);
-  max-width: 18ch;
+  /* Larga o bastante para as duas frases da promessa caberem em uma linha
+     cada — o <br> do markup é quem decide a quebra, não a falta de espaço. */
+  max-width: 26ch;
+  line-height: 1.15;
 }
+
+.landing__points {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: var(--tc-space-3);
+}
+
+.landing__points li {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--tc-space-3);
+  font-size: var(--tc-text-sm);
+  line-height: 1.5;
+  color: var(--tc-ink-soft);
+}
+
+.landing__points ion-icon {
+  flex: none;
+  font-size: 20px;
+  color: var(--tc-brand);
+  margin-top: 1px;
+}
+
+.landing__points strong { color: var(--tc-ink); }
+
+/* --- cartão da oferta ---------------------------------------------------- */
+
+.landing__offer {
+  border: 1px solid var(--tc-line);
+  border-radius: var(--tc-radius-lg);
+  background: var(--tc-surface);
+  box-shadow: var(--tc-shadow-lift);
+  padding: var(--tc-space-5);
+  text-align: center;
+}
+
+.landing__offer-tag {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 999px;
+  background: var(--tc-brand-soft);
+  color: var(--tc-brand);
+  font-size: var(--tc-text-xs);
+  font-weight: 700;
+}
+
+.landing__offer-price {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 4px;
+  margin: var(--tc-space-4) 0 var(--tc-space-2);
+}
+
+.landing__offer-value {
+  font-size: clamp(34px, 8vw, 44px);
+  font-weight: 700;
+  line-height: 1;
+  color: var(--tc-ink);
+  letter-spacing: -0.02em;
+}
+
+.landing__offer-period {
+  font-size: var(--tc-text-md);
+  color: var(--tc-ink-faint);
+}
+
+.landing__offer-loading {
+  width: 60%;
+  height: 44px;
+  margin: var(--tc-space-4) auto var(--tc-space-2);
+}
+
+.landing__offer-note {
+  font-size: var(--tc-text-sm);
+  color: var(--tc-ink-soft);
+  line-height: 1.5;
+  margin: 0 0 var(--tc-space-4);
+}
+
+.landing__offer-fine {
+  font-size: var(--tc-text-xs);
+  color: var(--tc-ink-faint);
+  line-height: 1.5;
+  margin: var(--tc-space-3) 0 0;
+}
+
+.landing__offer-login {
+  margin-top: var(--tc-space-3);
+  background: none;
+  border: 0;
+  padding: 4px;
+  font: inherit;
+  font-size: var(--tc-text-sm);
+  color: var(--tc-brand);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.landing__offer-login:hover { text-decoration: underline; }
 
 .landing__lead {
   font-size: var(--tc-text-md);
   color: var(--tc-ink-soft);
   line-height: 1.7;
   max-width: 56ch;
-  margin: 0 0 var(--tc-space-6);
-}
-
-.landing__cta {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--tc-space-3);
+  margin: 0 0 var(--tc-space-5);
 }
 
 .landing__verify { padding: var(--tc-space-6) 0; }
@@ -256,4 +367,79 @@
   .landing__lane {
     animation: none;
   }
+}
+
+/* =============================================================================
+   Como funciona
+   ========================================================================= */
+
+.landing__steps {
+  padding: var(--tc-space-7) 0;
+  border-bottom: 1px solid var(--tc-line);
+}
+
+.landing__steps-title {
+  font-size: clamp(22px, 4vw, var(--tc-text-2xl));
+  margin: 0 0 var(--tc-space-6);
+  max-width: 24ch;
+}
+
+.landing__steps-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: var(--tc-space-5);
+}
+
+@media (min-width: 760px) {
+  .landing__steps-list { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+
+.landing__step-num {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: var(--tc-brand-soft);
+  color: var(--tc-brand);
+  font-weight: 700;
+  font-size: var(--tc-text-sm);
+  margin-bottom: var(--tc-space-3);
+}
+
+.landing__step-title {
+  font-size: var(--tc-text-md);
+  margin: 0 0 var(--tc-space-2);
+}
+
+.landing__step-text {
+  font-size: var(--tc-text-sm);
+  color: var(--tc-ink-soft);
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* =============================================================================
+   Fechamento
+   ========================================================================= */
+
+.landing__close {
+  padding: var(--tc-space-7) 0;
+  text-align: center;
+  background: var(--tc-surface);
+  border-bottom: 1px solid var(--tc-line);
+}
+
+.landing__close-title {
+  font-size: clamp(24px, 5vw, var(--tc-text-2xl));
+  margin: 0 auto var(--tc-space-3);
+  max-width: 20ch;
+}
+
+.landing__close-text {
+  font-size: var(--tc-text-md);
+  color: var(--tc-ink-soft);
+  margin: 0 0 var(--tc-space-5);
 }
