@@ -1,16 +1,18 @@
-# This file is used by the build system to adjust CSS and JS output to support the specified browsers below.
-# For additional information regarding the format and rule options, please see:
-# https://github.com/browserslist/browserslist#queries
+# Navegadores suportados pelo build.
+#
+# A lista anterior vinha do scaffold original do Ionic (Chrome >=79, Safari >=14,
+# iOS >=14) e é anterior ao Angular 19. Com ela, o esbuild aborta o build de
+# produção com "Transforming destructuring to the configured target environment
+# is not supported yet" — inclusive no runtime do próprio webpack.
+#
+# Estes alvos acompanham o que o Angular 19 realmente suporta e continuam
+# cobrindo os navegadores usados no público da plataforma.
+# Confira o resultado com:  npx browserslist
 
-# For the full list of supported browsers by the Angular framework, please see:
-# https://angular.io/guide/browser-support
-
-# You can see what browsers were selected by your queries by running:
-#   npx browserslist
-
-Chrome >=79
-ChromeAndroid >=79
-Firefox >=70
-Edge >=79
-Safari >=14
-iOS >=14
+last 2 Chrome versions
+last 2 Firefox versions
+last 2 Edge versions
+last 2 Safari versions
+last 2 iOS versions
+last 2 ChromeAndroid versions
+Firefox ESR
