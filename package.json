@@ -1,8 +1,8 @@
 {
-  "name": "app",
-  "version": "0.0.1",
-  "author": "Ionic Framework",
-  "homepage": "https://ionicframework.com/",
+  "name": "cursando-pro",
+  "version": "1.0.0",
+  "author": "Cursando.Pro",
+  "homepage": "https://cursando.pro",
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
@@ -61,5 +61,5 @@
     "karma-jasmine-html-reporter": "~2.1.0",
     "typescript": "~5.6.3"
   },
-  "description": "An Ionic project"
+  "description": "Cursando.Pro — plataforma de cursos com certificados verificáveis"
 }

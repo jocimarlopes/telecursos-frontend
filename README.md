@@ -1,1 +1,1 @@
-# telecursos-frontend
+# cursando-frontend
