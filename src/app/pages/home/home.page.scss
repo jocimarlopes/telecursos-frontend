@@ -1,0 +1,110 @@
+.upsell {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--tc-space-4);
+  background: var(--tc-brand-soft);
+  border: 1px solid rgba(20, 75, 166, 0.16);
+  border-radius: var(--tc-radius);
+  padding: var(--tc-space-5);
+  margin-bottom: var(--tc-space-6);
+}
+
+.upsell__title {
+  font-size: var(--tc-text-lg);
+  margin: 0 0 var(--tc-space-1);
+}
+
+.upsell__lead {
+  color: var(--tc-ink-soft);
+  font-size: var(--tc-text-sm);
+  margin: 0;
+}
+
+/* --- vitrine "Alunos estão fazendo" -------------------------------------- */
+
+.popular {
+  margin-bottom: var(--tc-space-6);
+  padding-bottom: var(--tc-space-5);
+  border-bottom: 1px solid var(--tc-line);
+}
+
+/* Trilho horizontal: a vitrine não pode empurrar o catálogo para fora da
+   primeira dobra, então rola de lado em vez de crescer para baixo. */
+.popular__rail {
+  list-style: none;
+  margin: var(--tc-space-4) 0 0;
+  padding: 0 var(--tc-space-1) var(--tc-space-2);
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(180px, 200px);
+  gap: var(--tc-space-4);
+  overflow-x: auto;
+  scroll-snap-type: x proximity;
+  overscroll-behavior-x: contain;
+}
+
+.popular__rail > li {
+  scroll-snap-align: start;
+  display: flex;
+}
+
+.popular__card {
+  position: relative;
+  width: 100%;
+}
+
+.popular__card[disabled] {
+  opacity: 0.6;
+  cursor: progress;
+}
+
+.popular__loading {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background: rgba(255, 255, 255, 0.7);
+  border-radius: var(--tc-radius);
+}
+
+.home__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--tc-space-4);
+}
+
+.home__search {
+  --background: var(--tc-surface);
+  --border-radius: var(--tc-radius-sm);
+  --box-shadow: none;
+  --color: var(--tc-ink);
+  --placeholder-color: var(--tc-ink-faint);
+  border: 1px solid var(--tc-line-strong);
+  border-radius: var(--tc-radius-sm);
+  padding: 0;
+  max-width: 320px;
+  width: 100%;
+}
+
+.home__grid {
+  display: grid;
+  gap: var(--tc-space-4);
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 220px), 1fr));
+}
+
+.home__skeleton {
+  aspect-ratio: 16 / 11;
+}
+
+/* Vencida: âmbar em vez de azul, para diferenciar de uma oferta comum. */
+.upsell--expired,
+.upsell--warning {
+  background: var(--tc-wait-soft);
+  border-color: rgba(154, 91, 6, 0.22);
+}
+
+.upsell--expired .tc-eyebrow { color: var(--tc-wait); }

@@ -1,26 +1,51 @@
+<ion-content class="tc-page">
+  <div class="auth">
+    <div class="auth__panel">
+      <img class="auth__logo" src="assets/logomarca.png" alt="Cursando.Pro">
 
+      <h1 class="auth__title">Entrar na sua conta</h1>
+      <p class="auth__lead">Continue de onde parou e emita seus certificados.</p>
 
-<ion-content [fullscreen]="true" class="login-content">
-  <div class="login-container">
-    <div>
-      <img class="logo-image" src="assets/logomarca.png">
+      <form (ngSubmit)="doLogin()">
+        <label class="tc-label" for="email">E-mail</label>
+        <ion-item lines="none" class="tc-field">
+          <ion-input id="email" type="email" inputmode="email" autocomplete="email"
+                     placeholder="voce@email.com" [(ngModel)]="email"
+                     name="email"></ion-input>
+        </ion-item>
+
+        <label class="tc-label" for="senha">Senha</label>
+        <ion-item lines="none" class="tc-field">
+          <ion-input id="senha" [type]="showPassword ? 'text' : 'password'"
+                     autocomplete="current-password" placeholder="Sua senha"
+                     [(ngModel)]="password" name="password"></ion-input>
+          <!-- O aria-label é estático de propósito: bindá-lo dinamicamente num
+               componente Ionic dispara o watcher de atributo do Stencil antes
+               da instância existir, e o console enche de erro. O estado atual
+               vai no texto oculto abaixo. -->
+          <ion-button slot="end" fill="clear" type="button"
+                      aria-label="Alternar exibição da senha"
+                      (click)="showPassword = !showPassword">
+            <ion-icon slot="icon-only"
+                      [name]="showPassword ? 'eye-off-outline' : 'eye-outline'"></ion-icon>
+          </ion-button>
+        </ion-item>
+        <span class="sr-only" aria-live="polite">
+          {{ showPassword ? 'Senha visível' : 'Senha oculta' }}
+        </span>
+
+        <p class="auth__error" *ngIf="error" role="alert">{{ error }}</p>
+
+        <ion-button type="submit" expand="block" class="tc-btn" [disabled]="submitting">
+          <ion-spinner *ngIf="submitting" name="crescent" slot="start"></ion-spinner>
+          {{ submitting ? 'Entrando…' : 'Entrar' }}
+        </ion-button>
+      </form>
+
+      <p class="auth__switch">
+        Ainda não tem conta?
+        <a (click)="goRegister()" tabindex="0" (keydown.enter)="goRegister()">Criar conta</a>
+      </p>
     </div>
-
-    <h2 class="title">Bem-vindo 👋</h2>
-    <p class="subtitle">Entre para começar a aprender com os melhores cursos</p>
-
-    <ion-item lines="none" class="input-item">
-      <ion-input placeholder="Email" [(ngModel)]="email" type="email"></ion-input>
-    </ion-item>
-
-    <ion-item lines="none" class="input-item">
-      <ion-input placeholder="Senha" [(ngModel)]="password" type="password"></ion-input>
-    </ion-item>
-
-    <ion-button expand="block" class="login-button" (click)="doLogin()">Entrar</ion-button>
-
-    <ion-button fill="clear" class="signup-text" (click)="goRegister()">Cadastrar agora</ion-button>
-    <ion-button fill="clear" class="signup-text" disabled>esqueci minha senha</ion-button>
   </div>
 </ion-content>
-

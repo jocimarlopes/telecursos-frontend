@@ -5,9 +5,9 @@ import { RouterModule, Routes } from '@angular/router';
 import { IonicModule } from '@ionic/angular';
 import { ComponentsModule } from 'src/app/components/components.module';
 
-import { HomePage } from './home.page';
+import { HowToPage } from './how-to.page';
 
-const routes: Routes = [{ path: '', component: HomePage }];
+const routes: Routes = [{ path: '', component: HowToPage }];
 
 @NgModule({
   imports: [
@@ -17,6 +17,6 @@ const routes: Routes = [{ path: '', component: HomePage }];
     RouterModule.forChild(routes),
     ComponentsModule,
   ],
-  declarations: [HomePage],
+  declarations: [HowToPage],
 })
-export class HomePageModule { }
+export class HowToPageModule { }

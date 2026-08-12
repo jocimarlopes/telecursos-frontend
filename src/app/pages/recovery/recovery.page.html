@@ -1,13 +1,18 @@
-<ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title>recovery</ion-title>
-  </ion-toolbar>
-</ion-header>
+<ion-content class="tc-page">
+  <div class="auth">
+    <div class="auth__panel">
+      <img class="auth__logo" src="assets/logomarca.png" alt="Cursando.Pro">
 
-<ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">recovery</ion-title>
-    </ion-toolbar>
-  </ion-header>
+      <h1 class="auth__title">Recuperar senha</h1>
+      <p class="auth__lead">
+        A redefinição automática de senha ainda não está disponível.
+        Envie um e-mail para <strong>contato&#64;cursando.pro</strong> com o
+        endereço cadastrado que reativamos seu acesso.
+      </p>
+
+      <ion-button expand="block" class="tc-btn" (click)="goLogin()">
+        Voltar para o login
+      </ion-button>
+    </div>
+  </div>
 </ion-content>

@@ -1,0 +1,100 @@
+<app-header [back]="true" title="Detalhes do curso"></app-header>
+
+<ion-content class="tc-page">
+  <div class="tc-container">
+
+    <div class="course__loading" *ngIf="loading">
+      <ion-spinner name="crescent" color="primary"></ion-spinner>
+      <p>Carregando o curso…</p>
+    </div>
+
+    <div class="tc-empty" *ngIf="!loading && failed">
+      <ion-icon class="tc-empty__icon" name="alert-circle-outline"></ion-icon>
+      <h2 class="tc-empty__title">Curso não encontrado</h2>
+      <p class="tc-empty__text">
+        Este curso pode ter saído do catálogo ou o link está incorreto.
+      </p>
+      <ion-button class="tc-btn" routerLink="/home">Voltar ao catálogo</ion-button>
+    </div>
+
+    <article class="course" *ngIf="!loading && course">
+      <div class="course__main">
+        <img class="course__cover" *ngIf="cover" [src]="cover" [alt]="course.title">
+
+        <h1 class="course__title">{{ course.title }}</h1>
+        <p class="course__text" *ngIf="course.text">{{ course.text }}</p>
+      </div>
+
+      <aside class="course__side">
+
+        <!-- Acesso ao curso -->
+        <div class="tc-card">
+          <div class="tc-card__body">
+            <h2 class="tc-card__title">Acessar o curso</h2>
+
+            <ng-container *ngIf="isPremium; else naoPremium">
+              <ion-button *ngFor="let item of downloadLinks"
+                          expand="block" class="tc-btn course__action"
+                          [disabled]="starting"
+                          (click)="startCourse(item)">
+                <ion-icon slot="start" name="play-circle-outline"></ion-icon>
+                {{ item.text }}
+              </ion-button>
+
+              <p class="course__note" *ngIf="!downloadLinks.length">
+                Este curso está sem link de acesso no momento.
+              </p>
+
+              <ion-button fill="clear" size="small" expand="block" (click)="goHowTo()">
+                Como acessar o curso?
+              </ion-button>
+            </ng-container>
+
+            <ng-template #naoPremium>
+              <p class="course__note" *ngIf="isExpired">
+                Sua assinatura venceu. Renove para voltar a acessar este e os
+                demais cursos.
+              </p>
+              <p class="course__note" *ngIf="!isExpired">
+                Este curso faz parte da assinatura. Por 30 dias você libera o
+                catálogo inteiro e passa a emitir certificados.
+              </p>
+              <ion-button expand="block" class="tc-btn" (click)="goSubscribe()">
+                {{ isExpired ? 'Renovar assinatura' : 'Ver planos' }}
+              </ion-button>
+            </ng-template>
+          </div>
+        </div>
+
+        <!-- Certificado -->
+        <div class="tc-card course__certificate" *ngIf="isPremium">
+          <div class="tc-card__body">
+            <h2 class="tc-card__title">Certificado</h2>
+
+            <ng-container *ngIf="!accessed">
+              <p class="course__note">
+                Comece o curso para liberar a emissão do certificado.
+              </p>
+            </ng-container>
+
+            <ng-container *ngIf="accessed">
+              <span class="tc-tag tc-tag--ready">
+                <ion-icon name="ribbon-outline"></ion-icon>
+                Disponível na hora
+              </span>
+              <p class="course__note">
+                O certificado é um item à parte da assinatura. Você escolhe a
+                instituição e a carga horária, paga e baixa na hora — com código
+                e QR Code de verificação.
+              </p>
+              <ion-button expand="block" class="tc-btn" (click)="goIssue()">
+                <ion-icon slot="start" name="ribbon-outline"></ion-icon>
+                Emitir certificado
+              </ion-button>
+            </ng-container>
+          </div>
+        </div>
+      </aside>
+    </article>
+  </div>
+</ion-content>

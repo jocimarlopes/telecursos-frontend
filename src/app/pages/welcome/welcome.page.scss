@@ -1,0 +1,68 @@
+.welcome { padding-top: var(--tc-space-7); }
+
+.welcome__logo {
+  height: 44px;
+  width: auto;
+  margin-bottom: var(--tc-space-5);
+}
+
+.welcome__title {
+  font-size: var(--tc-text-2xl);
+  margin: 0 0 var(--tc-space-2);
+}
+
+.welcome__lead {
+  color: var(--tc-ink-soft);
+  margin: 0 0 var(--tc-space-6);
+}
+
+.welcome__steps {
+  list-style: none;
+  counter-reset: step;
+  padding: 0;
+  margin: 0 0 var(--tc-space-6);
+  display: grid;
+  gap: var(--tc-space-4);
+}
+
+/* A numeração aqui é informativa: os passos acontecem nesta ordem, e o aluno
+   precisa saber que o certificado vem depois de iniciar o curso. */
+.welcome__step {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: var(--tc-space-4);
+  align-items: start;
+  background: var(--tc-surface);
+  border: 1px solid var(--tc-line);
+  border-radius: var(--tc-radius);
+  padding: var(--tc-space-4);
+}
+
+.welcome__number {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: var(--tc-brand-soft);
+  color: var(--tc-brand);
+  font-weight: 700;
+  font-size: var(--tc-text-sm);
+}
+
+.welcome__step-title {
+  display: flex;
+  align-items: center;
+  gap: var(--tc-space-2);
+  font-size: var(--tc-text-md);
+  margin: 0 0 var(--tc-space-1);
+}
+
+.welcome__step-title ion-icon { color: var(--tc-brand); }
+
+.welcome__step-text {
+  color: var(--tc-ink-soft);
+  font-size: var(--tc-text-sm);
+  line-height: 1.6;
+  margin: 0;
+}

@@ -1,0 +1,25 @@
+<ion-content class="tc-page">
+  <div class="tc-container tc-container--narrow welcome">
+    <img class="welcome__logo" src="assets/logomarca.png" alt="Cursando.Pro">
+
+    <h1 class="welcome__title">Bem-vindo ao Cursando.Pro</h1>
+    <p class="welcome__lead">Como funciona, em quatro passos.</p>
+
+    <ol class="welcome__steps">
+      <li class="welcome__step" *ngFor="let step of steps; let i = index">
+        <span class="welcome__number">{{ i + 1 }}</span>
+        <div>
+          <h2 class="welcome__step-title">
+            <ion-icon [name]="step.icon"></ion-icon>
+            {{ step.title }}
+          </h2>
+          <p class="welcome__step-text">{{ step.text }}</p>
+        </div>
+      </li>
+    </ol>
+
+    <ion-button expand="block" class="tc-btn" (click)="start()">
+      Ver os cursos
+    </ion-button>
+  </div>
+</ion-content>

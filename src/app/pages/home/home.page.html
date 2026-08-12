@@ -1,56 +1,125 @@
-<ion-header [translucent]="true">
-  <ion-toolbar color="transparent">
-    <img (click)="lista = []; getCourses(); scrollToTop()" class="logo" src="assets/logo.png">
-    <ion-title>Tele Cursos</ion-title>
-    <ion-buttons slot="end">
-      <ion-button (click)="goToProfile()" fill="clear" color="dark" size="small">
-        <ion-icon name="person"></ion-icon>
-      </ion-button>
-      <ion-button (click)="isSearching = !isSearching; scrollToTop()" size="small" fill="clear" color="dark">
-        <ion-icon name="search"></ion-icon>
-      </ion-button>
-    </ion-buttons>
-  </ion-toolbar>
-</ion-header>
+<app-header></app-header>
 
-<ion-content [fullscreen]="true" class="home-content ion-text-center">
-  <ion-refresher slot="fixed" (ionRefresh)="handleRefresh($event)">
+<ion-content class="tc-page">
+  <ion-refresher slot="fixed" (ionRefresh)="refresh($event)">
     <ion-refresher-content></ion-refresher-content>
   </ion-refresher>
 
-  <ion-searchbar (ionInput)="handleInput($event)" *ngIf="isSearching" animated="false" placeholder="Pesquisar curso"></ion-searchbar>
+  <div class="tc-container">
 
-  <div *ngIf="isLoading && !lista.length" class="loading">
-    <ion-spinner color="dark" name="circular"></ion-spinner>
-  </div>
+    <!-- Chamada para assinar, só para quem não tem acesso agora -->
+    <div class="upsell" *ngIf="!isPremium" [class.upsell--expired]="isExpired">
+      <div class="upsell__text">
+        <span class="tc-eyebrow">{{ isExpired ? 'Assinatura vencida' : 'Assinatura mensal' }}</span>
+        <h2 class="upsell__title">
+          {{ isExpired
+             ? 'Renove para voltar a acessar os cursos'
+             : 'Libere todos os cursos e emita certificados' }}
+        </h2>
+        <p class="upsell__lead">Acesso por 30 dias, sem fidelidade.</p>
+      </div>
+      <ion-button class="tc-btn" (click)="goSubscribe()">
+        {{ isExpired ? 'Renovar' : 'Ver planos' }}
+      </ion-button>
+    </div>
 
-  <div *ngIf="!isLoading && !lista.length" class="loading">
-    <ion-text color="dark">
-      Erro ao carregar cursos, tente novamente
-    </ion-text>
-  </div>
+    <!-- Aviso discreto quando faltam poucos dias -->
+    <div class="upsell upsell--warning"
+         *ngIf="isPremium && daysLeft !== null && daysLeft <= 5">
+      <div class="upsell__text">
+        <h2 class="upsell__title">
+          Sua assinatura vence em {{ daysLeft }} dia(s)
+        </h2>
+        <p class="upsell__lead">
+          Renovando agora, os dias restantes são somados ao novo mês.
+        </p>
+      </div>
+      <ion-button class="tc-btn" (click)="goSubscribe()">Renovar</ion-button>
+    </div>
 
-  
-  <div *ngIf="lista.length">
-    <h2 class="section-title">Últimos adicionados</h2>
-    <ion-row>
-      <ion-col *ngFor="let course of lista" [size]="width > 600 ? 3 : 12">
-          <ion-card (click)="getCourseInfos(course)" class="course-card">
-            <img [src]="course.image" alt="Capa do curso" />
-            <ion-card-content>
-              <ion-text class="title">{{ course.title }}</ion-text>
-            </ion-card-content>
-          </ion-card>
-      </ion-col>
-    </ion-row>
+    <!-- Vitrine: o que outros alunos estão fazendo. Some durante a busca,
+         onde o usuário já sabe o que procura. -->
+    <section class="popular" *ngIf="!isSearching && popular.length">
+      <h2 class="tc-section-title">Alunos estão fazendo</h2>
+      <p class="tc-section-sub">Cursos que já foram iniciados aqui na plataforma.</p>
+
+      <ul class="popular__rail">
+        <li *ngFor="let course of popular; trackBy: trackByPopular">
+          <button type="button" class="tc-course-card popular__card"
+                  [disabled]="!!openingPopular"
+                  (click)="openPopular(course)">
+            <cover-image class="tc-course-card__cover"
+                         [src]="course.image" [title]="course.name"></cover-image>
+            <div class="tc-course-card__body">
+              <h3 class="tc-course-card__title">{{ course.name }}</h3>
+            </div>
+            <span class="popular__loading" *ngIf="openingPopular === course.name">
+              <ion-spinner name="crescent"></ion-spinner>
+            </span>
+          </button>
+        </li>
+      </ul>
+    </section>
+
+    <div class="home__head">
+      <div>
+        <h1 class="tc-section-title">
+          {{ isSearching ? 'Resultados da busca' : 'Cursos disponíveis' }}
+        </h1>
+        <p class="tc-section-sub">
+          {{ isSearching
+             ? (courses.length + ' curso(s) para "' + searchTerm + '"')
+             : 'Novos cursos adicionados toda semana' }}
+        </p>
+      </div>
+
+      <ion-searchbar class="home__search"
+                     (ionInput)="onSearchInput($event)"
+                     [debounce]="0"
+                     placeholder="Buscar curso"
+                     mode="md"></ion-searchbar>
+    </div>
+
+    <!-- Carregando -->
+    <div class="home__grid" *ngIf="loading">
+      <div class="tc-skeleton home__skeleton" *ngFor="let i of [1,2,3,4,5,6,7,8]"></div>
+    </div>
+
+    <!-- Erro -->
+    <div class="tc-empty" *ngIf="!loading && failed">
+      <ion-icon class="tc-empty__icon" name="cloud-offline-outline"></ion-icon>
+      <h2 class="tc-empty__title">Não foi possível carregar os cursos</h2>
+      <p class="tc-empty__text">Verifique sua conexão e tente novamente.</p>
+      <ion-button class="tc-btn" (click)="loadCourses()">Tentar novamente</ion-button>
+    </div>
+
+    <!-- Busca sem resultado -->
+    <div class="tc-empty" *ngIf="!loading && !failed && !courses.length">
+      <ion-icon class="tc-empty__icon" name="search-outline"></ion-icon>
+      <h2 class="tc-empty__title">Nenhum curso encontrado</h2>
+      <p class="tc-empty__text">
+        Tente outras palavras ou veja todos os cursos disponíveis.
+      </p>
+      <ion-button class="tc-btn" fill="outline" (click)="loadCourses()">
+        Ver todos os cursos
+      </ion-button>
+    </div>
+
+    <!-- Grade -->
+    <div class="home__grid" *ngIf="!loading && courses.length">
+      <button type="button" class="tc-course-card"
+              *ngFor="let course of courses; trackBy: trackByCourse"
+              (click)="openCourse(course)">
+        <cover-image class="tc-course-card__cover"
+                     [src]="course.image" [title]="course.title"></cover-image>
+        <div class="tc-course-card__body">
+          <h3 class="tc-course-card__title">{{ course.title }}</h3>
+        </div>
+      </button>
+    </div>
+
+    <ion-infinite-scroll (ionInfinite)="loadMore($event)" [disabled]="isSearching">
+      <ion-infinite-scroll-content loadingSpinner="crescent"></ion-infinite-scroll-content>
+    </ion-infinite-scroll>
   </div>
-  <div class="copyright">
-    <ion-text color="dark" style="font-size: 12px;">
-      Tele Cursos &copy; 2023 - Todos os direitos reservados <br>
-    </ion-text>
-  </div>
-  <ion-infinite-scroll (ionInfinite)="onIonInfinite($event)">
-    <ion-infinite-scroll-content></ion-infinite-scroll-content>
-  </ion-infinite-scroll>
 </ion-content>
-

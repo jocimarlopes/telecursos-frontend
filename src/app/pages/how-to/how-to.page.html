@@ -1,0 +1,62 @@
+<app-header [back]="true" title="Como acessar"></app-header>
+
+<ion-content class="tc-page">
+  <div class="tc-container tc-container--narrow">
+    <h1 class="tc-section-title">Como acessar os cursos</h1>
+    <p class="tc-section-sub">
+      O conteúdo é baixado para o seu dispositivo, então você assiste offline,
+      quantas vezes quiser.
+    </p>
+
+    <ol class="howto__steps">
+      <li class="howto__step">
+        <span class="howto__number">1</span>
+        <div>
+          <h2 class="howto__title">Instale o uTorrent</h2>
+          <p class="howto__text">
+            É o programa que baixa o conteúdo do curso. Funciona no computador
+            e no celular.
+          </p>
+          <ion-button class="tc-btn" size="small" (click)="openUtorrent()">
+            <ion-icon slot="start" name="open-outline"></ion-icon>
+            Baixar o uTorrent
+          </ion-button>
+        </div>
+      </li>
+
+      <li class="howto__step">
+        <span class="howto__number">2</span>
+        <div>
+          <h2 class="howto__title">Abra o curso pela plataforma</h2>
+          <p class="howto__text">
+            Na página do curso, clique em <strong>Acessar curso</strong>.
+            O uTorrent abre sozinho e começa o download.
+          </p>
+        </div>
+      </li>
+
+      <li class="howto__step">
+        <span class="howto__number">3</span>
+        <div>
+          <h2 class="howto__title">Estude no seu ritmo</h2>
+          <p class="howto__text">
+            Terminado o download, o conteúdo fica salvo no seu dispositivo.
+            Não precisa de internet para assistir.
+          </p>
+        </div>
+      </li>
+
+      <li class="howto__step">
+        <span class="howto__number">4</span>
+        <div>
+          <h2 class="howto__title">Emita o certificado</h2>
+          <p class="howto__text">
+            O certificado fica disponível em <strong>Meus cursos</strong> assim
+            que você inicia. Escolhe a instituição e a carga horária, paga e
+            baixa na hora — ele é cobrado à parte da assinatura.
+          </p>
+        </div>
+      </li>
+    </ol>
+  </div>
+</ion-content>

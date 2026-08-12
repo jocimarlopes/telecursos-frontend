@@ -1,29 +1,73 @@
+<ion-content class="tc-page">
+  <div class="auth">
+    <div class="auth__panel">
+      <img class="auth__logo" src="assets/logomarca.png" alt="Cursando.Pro">
 
+      <h1 class="auth__title">Criar sua conta</h1>
+      <p class="auth__lead">
+        Acesse os cursos e emita certificados com o nome da instituição.
+      </p>
 
-<ion-content [fullscreen]="true" class="register-content">
-  <ion-buttons class="ion-margin">
-    <ion-back-button color="dark" defaultHref="/login" text=""></ion-back-button>
-  </ion-buttons>
-  <div class="register-container">
-    <h2 class="title">Criar Conta</h2>
-    <p class="subtitle">Preencha os campos abaixo para começar sua jornada</p>
+      <form (ngSubmit)="doRegister()">
+        <div class="register__row">
+          <div>
+            <label class="tc-label" for="nome">Nome</label>
+            <ion-item lines="none" class="tc-field">
+              <ion-input id="nome" autocomplete="given-name" placeholder="Maria"
+                         [(ngModel)]="name" name="name"></ion-input>
+            </ion-item>
+          </div>
+          <div>
+            <label class="tc-label" for="sobrenome">Sobrenome</label>
+            <ion-item lines="none" class="tc-field">
+              <ion-input id="sobrenome" autocomplete="family-name" placeholder="Silva"
+                         [(ngModel)]="lastname" name="lastname"></ion-input>
+            </ion-item>
+          </div>
+        </div>
 
-    <ion-item lines="none" class="input-item">
-      <ion-input placeholder="Nome" [(ngModel)]="name" type="text"></ion-input>
-    </ion-item>
+        <label class="tc-label" for="email">E-mail</label>
+        <ion-item lines="none" class="tc-field">
+          <ion-input id="email" type="email" inputmode="email" autocomplete="email"
+                     placeholder="voce@email.com" [(ngModel)]="email" name="email"></ion-input>
+        </ion-item>
 
-    <ion-item lines="none" class="input-item">
-      <ion-input placeholder="Sobrenome" [(ngModel)]="lastname" type="text"></ion-input>
-    </ion-item>
+        <label class="tc-label" for="senha">Senha</label>
+        <ion-item lines="none" class="tc-field">
+          <ion-input id="senha" [type]="showPassword ? 'text' : 'password'"
+                     autocomplete="new-password" placeholder="Mínimo de 6 caracteres"
+                     [(ngModel)]="password" name="password"></ion-input>
+          <!-- Rótulo estático: ver comentário equivalente em login.page.html -->
+          <ion-button slot="end" fill="clear" type="button"
+                      aria-label="Alternar exibição da senha"
+                      (click)="showPassword = !showPassword">
+            <ion-icon slot="icon-only"
+                      [name]="showPassword ? 'eye-off-outline' : 'eye-outline'"></ion-icon>
+          </ion-button>
+        </ion-item>
+        <span class="sr-only" aria-live="polite">
+          {{ showPassword ? 'Senha visível' : 'Senha oculta' }}
+        </span>
 
-    <ion-item lines="none" class="input-item">
-      <ion-input placeholder="Email" [(ngModel)]="email" type="email"></ion-input>
-    </ion-item>
+        <label class="tc-label" for="confirmar">Confirmar senha</label>
+        <ion-item lines="none" class="tc-field">
+          <ion-input id="confirmar" type="password" autocomplete="new-password"
+                     placeholder="Repita a senha" [(ngModel)]="confirm"
+                     name="confirm"></ion-input>
+        </ion-item>
 
-    <ion-item lines="none" class="input-item">
-      <ion-input placeholder="Senha" [(ngModel)]="password" type="password"></ion-input>
-    </ion-item>
+        <p class="auth__error" *ngIf="error" role="alert">{{ error }}</p>
 
-    <ion-button expand="block" class="register-button" (click)="doRegister()">Cadastrar</ion-button>
+        <ion-button type="submit" expand="block" class="tc-btn" [disabled]="submitting">
+          <ion-spinner *ngIf="submitting" name="crescent" slot="start"></ion-spinner>
+          {{ submitting ? 'Criando conta…' : 'Criar conta' }}
+        </ion-button>
+      </form>
+
+      <p class="auth__switch">
+        Já tem conta?
+        <a (click)="goLogin()" tabindex="0" (keydown.enter)="goLogin()">Entrar</a>
+      </p>
+    </div>
   </div>
 </ion-content>

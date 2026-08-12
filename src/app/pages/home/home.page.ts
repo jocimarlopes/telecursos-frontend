@@ -1,10 +1,11 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { InfiniteScrollCustomEvent, IonContent, ModalController } from '@ionic/angular';
-import { CourseDetailsComponent } from 'src/app/components/course-details/course-details.component';
+import { InfiniteScrollCustomEvent, IonContent } from '@ionic/angular';
+import { Subscription } from 'rxjs';
 import { ApiService } from 'src/app/services/api.service';
 import { HelperService } from 'src/app/services/helper.service';
 import { PixelTrackerService } from 'src/app/services/pixel-tracker.service';
 import { UserService } from 'src/app/services/user.service';
+import { encodeCourseRef } from '../course/course-ref';
 
 @Component({
   selector: 'app-home',
@@ -15,135 +16,197 @@ import { UserService } from 'src/app/services/user.service';
 export class HomePage implements OnInit {
   @ViewChild(IonContent) content!: IonContent;
 
-  lista: any[] = []
-  nextPage: string = '1'
-  isSearching: boolean = false
-  searchSubs: any = null
-  isLoading: boolean = false
+  courses: any[] = [];
+  nextPage = '';
+  searchTerm = '';
+  isSearching = false;
+  loading = false;
+  loadingMore = false;
+  failed = false;
 
-  isPremium: boolean = false
-  width: number = window.innerWidth
+  /** Cursos que outros alunos estão fazendo — vitrine do topo da home. */
+  popular: any[] = [];
+  openingPopular = '';
+
+  private searchSub?: Subscription;
+  private searchDebounce: any;
 
   constructor(
     private api: ApiService,
     private helper: HelperService,
-    private user: UserService,
-    private modal: ModalController,
-    private tracking: PixelTrackerService
+    public user: UserService,
+    private tracking: PixelTrackerService,
   ) { }
 
   ngOnInit() {
-    this.verifyWidth()
-    this.verifyUser()
-    this.getCourses();
+    this.loadCourses();
+    this.loadPopular();
   }
 
-  verifyUser() {
-    this.user.userData$.subscribe(data => {
-      if(data) {
-        this.isPremium = !!parseInt(data.premium)
-      }
-    })
-  }
-
-  verifyWidth() {
-    this.helper.screenWidth$.subscribe(data => this.width = data)
-  }
-
-  getCourses(event?: any) {
-    this.isSearching = false
-    const token = this.user.getToken()
-    if (!token) return this.user.resetarUsuario()
-    this.isLoading = true
-    this.api.postWithToken('latest', {}, token).subscribe((data: any) => {
-      this.isLoading = false
-      this.nextPage = data.data.page
-      this.lista = data.data.data
-      if(event) (event.target as HTMLIonRefresherElement).complete();
-    }, () => {
-      this.isLoading = false
-      if(event) (event.target as HTMLIonRefresherElement).complete();
-    })
-  }
-
-  getCoursesByPage(page: string) {
-    this.isSearching = false
-    const token = this.user.getToken()
-    if (!token) return this.user.resetarUsuario()
-    this.isLoading = true
-    this.api.postWithToken('latest', {page: page}, token).subscribe((data: any) => {
-      this.isLoading = false
-      this.nextPage = data.data.page
-      this.lista = [...this.lista, ...data.data.data]
-    }, () => this.isLoading = false)
-  }
-
-  getCoursesBySearch(search: string) {
-    const token = this.user.getToken()
-    if (!token) return this.user.resetarUsuario()
-    this.isLoading = true
-    this.searchSubs = this.api.postWithToken('latest', {search: search}, token).subscribe((data: any) => {
-      this.isLoading = false
-      this.nextPage = '1'
-      this.lista = data.data
-      if(data.data.length) {
-        this.tracking.onSearch(search, this.lista[0].title || 'Curso Profissionalizante');
-      }
-    }, () => this.isLoading = false)
-  }
-
-  async getCourseInfos(localCourse: any) {    
-    const token = this.user.getToken()
-    if (!token) return this.user.resetarUsuario()
-    this.isLoading = true
-    await this.helper.loader('Carregando informações do curso...')
-    this.searchSubs = this.api.postWithToken('latest', {link: localCourse.link, name: localCourse.title}, token).subscribe(async (data: any) => {
-      await this.helper.closeLoader()
-      this.isLoading = false
-      const infos = {...data.data, image: localCourse.image}
-      this.openModalCourseDetails(infos);
-    }, async () => {
-      await this.helper.closeLoader()
-      this.isLoading = false
-    })
-  }
-
-  async openModalCourseDetails(details: any) {
-    const modal = await this.modal.create({
-      component: CourseDetailsComponent,
-      componentProps: {
-        details: details,
-        isPremium: this.isPremium
-      }
+  /** Carrega a vitrine. Falha em silêncio: é conteúdo acessório da home. */
+  private loadPopular() {
+    this.api.get('api/popular-courses').subscribe({
+      next: (res: any) => { this.popular = res.courses || []; },
+      error: () => { this.popular = []; },
     });
-    await modal.present();
   }
 
-  async handleRefresh(event: CustomEvent) {
-    this.getCourses(event)
+  /**
+   * Abre um curso da vitrine.
+   *
+   * A vitrine vem do nosso banco, que guarda o magnet do torrent — não a URL
+   * da página do curso, que é o que a tela de detalhes precisa. Então
+   * resolvemos o link buscando pelo título e navegando para o primeiro
+   * resultado. Se não achar, cai para a busca na própria home, que ao menos
+   * mostra ao usuário o que existe com aquele termo.
+   */
+  openPopular(course: any) {
+    if (this.openingPopular) return;
+    this.openingPopular = course.name;
+
+    this.api.postLegacy('latest', { search: course.name }, this.user.getToken())
+      .subscribe({
+        next: (res: any) => {
+          this.openingPopular = '';
+          const match = (res.data || [])[0];
+          if (!match?.link) return this.fallbackToSearch(course.name);
+          this.helper.goToPage(`/curso/${encodeCourseRef(match.link)}`, {
+            state: { course: { ...match, image: course.image || match.image } },
+          });
+        },
+        error: () => {
+          this.openingPopular = '';
+          this.helper.message('Não foi possível abrir o curso agora.', 3000, 'danger');
+        },
+      });
   }
 
-  onIonInfinite(event: InfiniteScrollCustomEvent) {
-    this.getCoursesByPage(this.nextPage)
-    setTimeout(() => {
+  private fallbackToSearch(term: string) {
+    this.searchTerm = term;
+    this.runSearch(term);
+    this.scrollToTop();
+  }
+
+  get isPremium(): boolean {
+    return this.user.isPremium;
+  }
+
+  get isExpired(): boolean {
+    return !!this.user.subscription?.expired;
+  }
+
+  get daysLeft(): number | null {
+    return this.user.daysLeft;
+  }
+
+  loadCourses(event?: any) {
+    this.isSearching = false;
+    this.searchTerm = '';
+    this.loading = true;
+    this.failed = false;
+
+    this.api.postLegacy('latest', {}, this.user.getToken()).subscribe({
+      next: (res: any) => {
+        this.loading = false;
+        this.nextPage = res.data.page;
+        this.courses = res.data.data;
+        event?.target?.complete();
+      },
+      error: () => {
+        this.loading = false;
+        this.failed = true;
+        event?.target?.complete();
+      },
+    });
+  }
+
+  loadMore(event: InfiniteScrollCustomEvent) {
+    // Na busca não há paginação; e sem próxima página não há o que carregar.
+    if (this.isSearching || !this.nextPage) {
       event.target.complete();
-    }, 500);
+      event.target.disabled = true;
+      return;
+    }
+
+    this.loadingMore = true;
+    this.api.postLegacy('latest', { page: this.nextPage }, this.user.getToken()).subscribe({
+      next: (res: any) => {
+        this.loadingMore = false;
+        this.nextPage = res.data.page;
+        this.courses = [...this.courses, ...res.data.data];
+        event.target.complete();
+      },
+      error: () => {
+        this.loadingMore = false;
+        event.target.complete();
+      },
+    });
   }
 
-  handleInput(event: Event) {
-    if(this.searchSubs) this.searchSubs.unsubscribe()
-    const target = event.target as HTMLIonSearchbarElement;
-    const query = target.value?.toLowerCase() || null;
-    if(!query) return this.getCourses()
-    this.getCoursesBySearch(query)
+  onSearchInput(event: Event) {
+    const query = ((event.target as HTMLIonSearchbarElement).value || '').trim();
+    this.searchTerm = query;
+
+    // Sem debounce, cada tecla disparava um scraping no servidor de origem.
+    clearTimeout(this.searchDebounce);
+    this.searchDebounce = setTimeout(() => {
+      if (!query) return this.loadCourses();
+      this.runSearch(query);
+    }, 400);
+  }
+
+  trackByPopular(_: number, course: any) {
+    return course.name;
+  }
+
+  private runSearch(query: string) {
+    this.searchSub?.unsubscribe();
+    this.loading = true;
+    this.failed = false;
+    this.isSearching = true;
+
+    this.searchSub = this.api.postLegacy('latest', { search: query }, this.user.getToken())
+      .subscribe({
+        next: (res: any) => {
+          this.loading = false;
+          this.courses = res.data || [];
+          if (this.courses.length) {
+            this.tracking.onSearch(query, this.courses[0].title || 'Curso Profissionalizante');
+          }
+        },
+        error: () => {
+          this.loading = false;
+          this.failed = true;
+        },
+      });
+  }
+
+  /**
+   * Abre a tela do curso.
+   *
+   * Antes isso carregava os detalhes aqui e abria um modal. Agora a própria
+   * tela do curso busca o que precisa a partir da URL, então o endereço pode
+   * ser compartilhado e o botão voltar funciona.
+   */
+  openCourse(course: any) {
+    this.helper.goToPage(`/curso/${encodeCourseRef(course.link)}`, {
+      state: { course },
+    });
+  }
+
+  refresh(event: CustomEvent) {
+    this.loadCourses(event);
   }
 
   scrollToTop() {
-    this.content.scrollToTop(400); // 400ms para fazer a animação suave
+    this.content?.scrollToTop(300);
   }
 
-  goToProfile() {
-    this.helper.goToPage('/profile');
+  goSubscribe() {
+    this.helper.goToPage('/assinar');
   }
 
+  trackByCourse(_: number, course: any) {
+    return course.link;
+  }
 }
