@@ -55,7 +55,9 @@
           <div class="checkout__line">
             <span>{{ isCertificate ? 'Certificado · emissão imediata'
                                    : 'Assinatura mensal · 30 dias' }}</span>
-            <strong>{{ helper.formatMoney(amountCents) }}</strong>
+            <strong *ngIf="!loadingQuote">{{ helper.formatMoney(amountCents) }}</strong>
+            <ion-skeleton-text *ngIf="loadingQuote" animated
+                               class="checkout__price-loading"></ion-skeleton-text>
           </div>
           <p class="checkout__line-note" *ngIf="isCertificate">
             Assim que o pagamento for confirmado, o certificado fica disponível
@@ -96,10 +98,13 @@
           <ng-container *ngIf="!pix">
             <p class="checkout__hint">
               O código Pix é gerado na hora e vale por 30 minutos.
-              Seu mês de acesso começa assim que o pagamento cair.
+              {{ isCertificate
+                 ? 'O certificado é liberado assim que o pagamento cair.'
+                 : 'Seu mês de acesso começa assim que o pagamento cair.' }}
             </p>
             <ion-button expand="block" class="tc-btn"
-                        [disabled]="submitting" (click)="generatePix()">
+                        [disabled]="submitting || loadingQuote || !amountCents"
+                        (click)="generatePix()">
               <ion-spinner *ngIf="submitting" name="crescent" slot="start"></ion-spinner>
               {{ submitting ? 'Gerando…' : 'Gerar código Pix' }}
             </ion-button>
@@ -193,7 +198,7 @@
             </ion-item>
 
             <ion-button type="submit" expand="block" class="tc-btn"
-                        [disabled]="submitting">
+                        [disabled]="submitting || loadingQuote || !amountCents">
               <ion-spinner *ngIf="submitting" name="crescent" slot="start"></ion-spinner>
               {{ submitting ? 'Processando…' : 'Pagar ' + helper.formatMoney(amountCents) }}
             </ion-button>

@@ -33,7 +33,10 @@ export class CheckoutPage implements OnInit, OnDestroy {
 
   submitting = false;
   error = '';
-  amountCents = 4900;
+
+  /** Valor a pagar. Vem do servidor; 0 até a cotação chegar. */
+  amountCents = 0;
+  loadingQuote = true;
 
   // Campos do cartão. Ficam só na memória do componente e são trocados por um
   // token no navegador — o número nunca chega ao nosso backend.
@@ -55,7 +58,7 @@ export class CheckoutPage implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.certificateUid = this.route.snapshot.queryParamMap.get('certificado');
-    this.loadSubscription();
+    this.loadQuote();
     this.cpf = this.helper.formatCpf(this.user.getUserData()?.cpf || '');
     this.restorePendingPix();
     this.prepareCard();
@@ -65,14 +68,31 @@ export class CheckoutPage implements OnInit, OnDestroy {
     this.stopPolling();
   }
 
-  /** Confere a assinatura no servidor: o token pode ter até 24h de atraso. */
-  private loadSubscription() {
-    if (this.isCertificate) return;
-    this.api.get('api/subscription', this.user.getToken()).subscribe({
+  /**
+   * Pergunta ao servidor quanto custa o que está sendo pago.
+   *
+   * O valor NUNCA é decidido no app. Antes o checkout trazia o preço da
+   * assinatura cravado e só pulava essa consulta quando era certificado —
+   * então a tela mostrava R$ 49,00 numa compra de certificado até o Pix ser
+   * gerado. Agora a mesma regra que cobra é a que informa o preço.
+   */
+  private loadQuote() {
+    this.loadingQuote = true;
+    const params = this.isCertificate
+      ? `?kind=certificate&certificate_uid=${this.certificateUid}`
+      : '?kind=premium';
+
+    this.api.get(`api/payments/quote${params}`, this.user.getToken()).subscribe({
       next: (res: any) => {
-        if (res?.price_cents) this.amountCents = res.price_cents;
+        this.loadingQuote = false;
+        this.amountCents = res.amount_cents ?? 0;
+        this.installmentOptions = this.mp.installmentOptions(this.amountCents);
       },
-      error: () => { /* mantém o valor padrão */ },
+      error: (err) => {
+        this.loadingQuote = false;
+        this.error = err?.error?.message
+          || 'Não foi possível carregar o valor. Recarregue a página.';
+      },
     });
   }
 
@@ -231,7 +251,9 @@ export class CheckoutPage implements OnInit, OnDestroy {
     try {
       await this.mp.load();
       this.cardReady = true;
-      this.installmentOptions = this.mp.installmentOptions(this.amountCents);
+      if (this.amountCents) {
+        this.installmentOptions = this.mp.installmentOptions(this.amountCents);
+      }
     } catch {
       // Sem o SDK o Pix continua funcionando; a aba de cartão avisa.
       this.cardReady = false;

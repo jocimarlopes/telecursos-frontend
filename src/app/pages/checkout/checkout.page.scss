@@ -77,3 +77,12 @@
 }
 
 .checkout__expired ion-icon { font-size: 20px; flex: none; }
+
+/* Enquanto o valor não chega do servidor, mostramos um esqueleto no lugar —
+   nunca um preço provisório, que seria mentira sobre o que vai ser cobrado. */
+.checkout__price-loading {
+  width: 90px;
+  height: 22px;
+  margin: 0;
+  border-radius: var(--tc-radius-sm);
+}

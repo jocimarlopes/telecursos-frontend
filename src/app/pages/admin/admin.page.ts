@@ -180,7 +180,7 @@ export class AdminPage implements OnInit {
       name: '',
       description: '',
       workload_hours: 40,
-      price_cents: 2000,
+      price_cents: 1990,
       active: true,
       // Layout inicial equivalente ao modelo original — o admin arrasta daqui.
       layout: {
