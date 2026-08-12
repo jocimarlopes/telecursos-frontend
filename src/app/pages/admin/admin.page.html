@@ -1,0 +1,522 @@
+<app-header [back]="true" title="Administração"></app-header>
+
+<ion-content class="tc-page">
+  <div class="tc-container">
+
+    <ion-segment class="admin__tabs" [value]="tab" mode="md"
+                 (ionChange)="switchTab($any($event.detail.value))">
+      <ion-segment-button value="institutions"><ion-label>Instituições</ion-label></ion-segment-button>
+      <ion-segment-button value="templates"><ion-label>Modelos</ion-label></ion-segment-button>
+      <ion-segment-button value="certificates"><ion-label>Certificados</ion-label></ion-segment-button>
+      <ion-segment-button value="payments"><ion-label>Pagamentos</ion-label></ion-segment-button>
+    </ion-segment>
+
+    <p class="auth__error" *ngIf="error" role="alert">{{ error }}</p>
+
+    <div class="tc-skeleton admin__skeleton" *ngIf="loading"></div>
+
+    <!-- ================= INSTITUIÇÕES ================= -->
+    <section *ngIf="tab === 'institutions' && !loading && !institutionForm">
+      <div class="admin__head">
+        <div>
+          <h1 class="tc-section-title">Instituições</h1>
+          <p class="tc-section-sub">
+            Cada instituição atende num subdomínio próprio de verificação.
+          </p>
+        </div>
+        <ion-button class="tc-btn" (click)="newInstitution()">
+          <ion-icon slot="start" name="add-outline"></ion-icon>
+          Nova instituição
+        </ion-button>
+      </div>
+
+      <div class="admin__grid">
+        <article class="tc-card admin__item" *ngFor="let inst of institutions">
+          <div class="tc-card__body">
+            <div class="admin__item-head">
+              <h2 class="tc-card__title">{{ inst.name }}</h2>
+              <span class="tc-tag" [ngClass]="inst.active ? 'tc-tag--issued' : 'tc-tag--muted'">
+                {{ inst.active ? 'Ativa' : 'Inativa' }}
+              </span>
+            </div>
+
+            <p class="admin__url">{{ inst.slug }}.cursando.pro</p>
+            <p class="tc-card__meta">
+              {{ inst.templates_count }} modelo(s) ativo(s)
+            </p>
+
+            <div class="admin__actions">
+              <ion-button size="small" fill="outline" class="tc-btn"
+                          (click)="editInstitution(inst)">Editar</ion-button>
+              <ion-button size="small" fill="clear" color="danger"
+                          (click)="deleteInstitution(inst)">Remover</ion-button>
+            </div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- formulário de instituição -->
+    <section class="tc-card" *ngIf="institutionForm">
+      <div class="tc-card__body">
+        <h1 class="tc-section-title">
+          {{ institutionForm.uid ? 'Editar instituição' : 'Nova instituição' }}
+        </h1>
+
+        <label class="tc-label" for="islug">Subdomínio</label>
+        <ion-item lines="none" class="tc-field">
+          <ion-input id="islug" placeholder="senai" [(ngModel)]="institutionForm.slug"
+                     name="slug"></ion-input>
+          <ion-note slot="end">.cursando.pro</ion-note>
+        </ion-item>
+
+        <label class="tc-label" for="iname">Nome de exibição</label>
+        <ion-item lines="none" class="tc-field">
+          <ion-input id="iname" placeholder="SENAI" [(ngModel)]="institutionForm.name"
+                     name="name"></ion-input>
+        </ion-item>
+
+        <label class="tc-label" for="ilegal">Razão social</label>
+        <ion-item lines="none" class="tc-field">
+          <ion-input id="ilegal" [(ngModel)]="institutionForm.legal_name"
+                     name="legal_name"></ion-input>
+        </ion-item>
+
+        <div class="admin__row">
+          <div>
+            <label class="tc-label" for="icnpj">CNPJ</label>
+            <ion-item lines="none" class="tc-field">
+              <ion-input id="icnpj" [(ngModel)]="institutionForm.cnpj" name="cnpj"></ion-input>
+            </ion-item>
+          </div>
+          <div>
+            <label class="tc-label" for="icolor">Cor da marca</label>
+            <ion-item lines="none" class="tc-field">
+              <input id="icolor" type="color" class="admin__color"
+                     [(ngModel)]="institutionForm.primary_color" name="primary_color">
+              <ion-input [(ngModel)]="institutionForm.primary_color"
+                         name="primary_color_text"></ion-input>
+            </ion-item>
+          </div>
+        </div>
+
+        <ion-item lines="none" class="tc-field">
+          <ion-toggle [(ngModel)]="institutionForm.active" name="active">
+            Instituição ativa
+          </ion-toggle>
+        </ion-item>
+
+        <div class="admin__upload" *ngIf="institutionForm.uid">
+          <label class="tc-label">Logo</label>
+          <input type="file" accept="image/png,image/jpeg,image/webp"
+                 (change)="uploadLogo(institutionForm, $event)">
+        </div>
+
+        <div class="admin__form-actions">
+          <ion-button class="tc-btn" (click)="saveInstitution()" [disabled]="savingInstitution">
+            <ion-spinner *ngIf="savingInstitution" name="crescent" slot="start"></ion-spinner>
+            Salvar
+          </ion-button>
+          <ion-button fill="clear" (click)="institutionForm = null">Cancelar</ion-button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= MODELOS ================= -->
+    <section *ngIf="tab === 'templates' && !loading && !templateForm">
+      <div class="admin__head">
+        <div>
+          <h1 class="tc-section-title">Modelos de certificado</h1>
+          <p class="tc-section-sub">
+            Arte de fundo, carga horária e posição de cada campo impresso.
+          </p>
+        </div>
+        <ion-button class="tc-btn" (click)="newTemplate()">
+          <ion-icon slot="start" name="add-outline"></ion-icon>
+          Novo modelo
+        </ion-button>
+      </div>
+
+      <div class="admin__grid">
+        <article class="tc-card admin__item" *ngFor="let template of templates">
+          <div class="tc-card__body">
+            <div class="admin__item-head">
+              <h2 class="tc-card__title">{{ template.name }}</h2>
+              <span class="tc-tag" [ngClass]="template.active ? 'tc-tag--issued' : 'tc-tag--muted'">
+                {{ template.active ? 'Ativo' : 'Inativo' }}
+              </span>
+            </div>
+
+            <p class="tc-card__meta">
+              {{ template.institution_name }} · {{ template.workload_hours }}h ·
+              {{ template.price_cents ? helper.formatMoney(template.price_cents) : 'Incluso no premium' }}
+            </p>
+
+            <p class="admin__warn" *ngIf="!template.has_background">
+              <ion-icon name="warning-outline"></ion-icon>
+              Sem arte de fundo — não é possível emitir.
+            </p>
+
+            <div class="admin__actions">
+              <ion-button size="small" fill="outline" class="tc-btn"
+                          (click)="editTemplate(template)">Editar</ion-button>
+              <ion-button size="small" fill="clear" color="danger"
+                          (click)="deleteTemplate(template)">Remover</ion-button>
+            </div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- editor de modelo -->
+    <section *ngIf="templateForm">
+      <h1 class="tc-section-title">
+        {{ templateForm.uid ? 'Editar modelo' : 'Novo modelo' }}
+      </h1>
+      <p class="tc-section-sub">
+        Arraste os campos direto sobre a arte, ou ajuste as coordenadas ao
+        lado para precisão fina.
+      </p>
+
+      <p class="editor__canvas-info editor__canvas-info--live"
+         *ngIf="isDragging && selectedField">
+        <strong>{{ fieldLabels[selectedField.key] }}</strong> —
+        X: <strong>{{ selectedField.x === null ? 'centro' : selectedField.x }}</strong> ·
+        Y: <strong>{{ selectedField.y }}</strong>
+      </p>
+
+      <p class="editor__canvas-info" *ngIf="templateForm.layout?.canvas?.width">
+        Coordenadas em pixels da arte:
+        <strong>{{ templateForm.layout.canvas.width }} × {{ templateForm.layout.canvas.height }}</strong>
+        — o mesmo valor que você lê num editor de imagem.
+      </p>
+
+      <div class="editor">
+        <!-- Área visual -->
+        <div class="editor__canvas-wrap">
+          <div class="editor__canvas" *ngIf="templateForm.uid && backgroundObjectUrl; else semArte">
+            <img class="editor__bg" [src]="backgroundObjectUrl" alt="Arte do certificado"
+                 draggable="false" (load)="onBackgroundLoad($event)">
+
+            <!-- Cada campo é desenhado com o texto e o corpo REAIS, na
+                 escala da arte. Antes era uma etiqueta de tamanho fixo, que
+                 mostrava a posição mas escondia o tamanho — por isso o editor
+                 parecia certo e o certificado saía com letra gigante. -->
+            <button type="button" class="editor__field-preview"
+                    *ngFor="let field of templateForm.layout.fields; let i = index"
+                    [class.editor__field-preview--active]="i === selectedFieldIndex"
+                    [style.top.%]="(field.y / templateForm.layout.canvas.height) * 100"
+                    [style.left.%]="field.align === 'center'
+                       ? 50 + ((field.x || 0) / templateForm.layout.canvas.width) * 100
+                       : ((field.x || 0) / templateForm.layout.canvas.width) * 100"
+                    [style.transform]="field.align === 'center'
+                       ? 'translateX(-50%)'
+                       : (field.align === 'right' ? 'translateX(-100%)' : 'none')"
+                    [style.fontSize.px]="previewFontSize(field)"
+                    [style.color]="field.color || '#000000'"
+                    [style.lineHeight]="field.line_height || 1.15"
+                    [title]="fieldLabels[field.key]"
+                    (pointerdown)="startDrag($event, field, i)">
+              <span class="editor__field-line" *ngFor="let linha of previewLines(field)">
+                {{ linha }}
+              </span>
+              <span class="editor__field-tag">{{ fieldLabels[field.key] }}</span>
+            </button>
+
+            <!-- Guia da largura máxima do campo selecionado -->
+            <div class="editor__maxwidth"
+                 *ngIf="selectedField?.max_width"
+                 [style.top.%]="(selectedField.y / templateForm.layout.canvas.height) * 100"
+                 [style.left.%]="selectedField.align === 'center'
+                    ? 50 + ((selectedField.x || 0) / templateForm.layout.canvas.width) * 100
+                    : ((selectedField.x || 0) / templateForm.layout.canvas.width) * 100"
+                 [style.width.%]="(selectedField.max_width / templateForm.layout.canvas.width) * 100"
+                 [style.transform]="selectedField.align === 'center'
+                    ? 'translateX(-50%)' : 'none'"></div>
+
+            <span class="editor__qr"
+                  [style.left.%]="(templateForm.layout.qrcode.x / templateForm.layout.canvas.width) * 100"
+                  [style.bottom.%]="((-templateForm.layout.qrcode.y - templateForm.layout.qrcode.size) / templateForm.layout.canvas.height) * 100"
+                  [style.width.%]="(templateForm.layout.qrcode.size / templateForm.layout.canvas.width) * 100"
+                  title="Arraste para posicionar o QR Code"
+                  (pointerdown)="startDrag($event, templateForm.layout.qrcode)">
+              QR
+            </span>
+          </div>
+
+          <ng-template #semArte>
+            <div class="editor__placeholder">
+              <ion-icon name="image-outline"></ion-icon>
+              <p *ngIf="!templateForm.uid">
+                Salve o modelo para poder enviar a arte de fundo.
+              </p>
+              <p *ngIf="templateForm.uid">
+                Este modelo ainda não tem arte de fundo. Envie um arquivo abaixo
+                para posicionar os campos.
+              </p>
+            </div>
+          </ng-template>
+
+          <div class="admin__upload" *ngIf="templateForm.uid">
+            <label class="tc-label">Arte de fundo (PNG, JPG ou WebP até 8 MB)</label>
+            <input type="file" accept="image/png,image/jpeg,image/webp"
+                   (change)="uploadBackground($event)">
+          </div>
+
+          <ion-button *ngIf="templateForm.uid" fill="outline" size="small" class="tc-btn"
+                      (click)="openPreview()">
+            <ion-icon slot="start" name="eye-outline"></ion-icon>
+            Ver prévia com dados de exemplo
+          </ion-button>
+        </div>
+
+        <!-- Controles -->
+        <aside class="editor__side">
+          <div class="tc-card">
+            <div class="tc-card__body">
+              <label class="tc-label" for="tinst">Instituição</label>
+              <ion-item lines="none" class="tc-field">
+                <ion-select id="tinst" interface="popover"
+                            [(ngModel)]="templateForm.institution_uid" name="institution_uid">
+                  <ion-select-option *ngFor="let inst of institutions" [value]="inst.uid">
+                    {{ inst.name }}
+                  </ion-select-option>
+                </ion-select>
+              </ion-item>
+
+              <label class="tc-label" for="tname">Nome do modelo</label>
+              <ion-item lines="none" class="tc-field">
+                <ion-input id="tname" placeholder="SENAI — Eletricista 60h"
+                           [(ngModel)]="templateForm.name" name="tname"></ion-input>
+              </ion-item>
+
+              <div class="admin__row">
+                <div>
+                  <label class="tc-label" for="thours">Carga horária</label>
+                  <ion-item lines="none" class="tc-field">
+                    <ion-input id="thours" type="number" [(ngModel)]="templateForm.workload_hours"
+                               name="workload_hours"></ion-input>
+                  </ion-item>
+                </div>
+                <div>
+                  <label class="tc-label" for="tprice">Preço (centavos)</label>
+                  <ion-item lines="none" class="tc-field">
+                    <ion-input id="tprice" type="number" [(ngModel)]="templateForm.price_cents"
+                               name="price_cents"></ion-input>
+                  </ion-item>
+                </div>
+              </div>
+              <p class="editor__hint">
+                0 = incluso no acesso premium.
+                {{ templateForm.price_cents ? helper.formatMoney(templateForm.price_cents) : '' }}
+              </p>
+
+              <ion-item lines="none" class="tc-field">
+                <ion-toggle [(ngModel)]="templateForm.active" name="tactive">
+                  Modelo ativo
+                </ion-toggle>
+              </ion-item>
+            </div>
+          </div>
+
+          <!-- Campos -->
+          <div class="tc-card">
+            <div class="tc-card__body">
+              <h2 class="tc-card__title">Campos impressos</h2>
+
+              <ul class="editor__fields">
+                <li *ngFor="let field of templateForm.layout.fields; let i = index"
+                    class="editor__field"
+                    [class.editor__field--active]="i === selectedFieldIndex"
+                    (click)="selectField(i)">
+                  <span>{{ fieldLabels[field.key] }}</span>
+                  <ion-button fill="clear" size="small" color="danger"
+                              (click)="removeField(i); $event.stopPropagation()">
+                    <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
+                  </ion-button>
+                </li>
+              </ul>
+
+              <ion-item lines="none" class="tc-field">
+                <ion-select placeholder="Adicionar campo" interface="popover"
+                            (ionChange)="addField($any($event.detail.value))">
+                  <ion-select-option *ngFor="let key of fieldKeys" [value]="key">
+                    {{ fieldLabels[key] }}
+                  </ion-select-option>
+                </ion-select>
+              </ion-item>
+
+              <!-- Ajuste fino do campo selecionado -->
+              <div class="editor__tuner" *ngIf="selectedField">
+                <h3 class="editor__tuner-title">{{ fieldLabels[selectedField.key] }}</h3>
+
+                <div class="admin__row">
+                  <div>
+                    <label class="tc-label">Posição X</label>
+                    <ion-item lines="none" class="tc-field">
+                      <ion-input type="number" placeholder="centralizado"
+                                 [(ngModel)]="selectedField.x"></ion-input>
+                    </ion-item>
+                  </div>
+                  <div>
+                    <label class="tc-label">Posição Y</label>
+                    <ion-item lines="none" class="tc-field">
+                      <ion-input type="number" [(ngModel)]="selectedField.y"></ion-input>
+                    </ion-item>
+                  </div>
+                </div>
+
+                <div class="editor__nudge">
+                  <ion-button size="small" fill="outline" title="Centralizar na horizontal"
+                              (click)="centerField(selectedField)">centro</ion-button>
+                  <ion-button size="small" fill="outline" (click)="nudge('y', -5)">↑</ion-button>
+                  <ion-button size="small" fill="outline" (click)="nudge('y', 5)">↓</ion-button>
+                  <ion-button size="small" fill="outline" (click)="nudge('x', -5)">←</ion-button>
+                  <ion-button size="small" fill="outline" (click)="nudge('x', 5)">→</ion-button>
+                </div>
+
+                <div class="admin__row">
+                  <div>
+                    <label class="tc-label">Tamanho da fonte</label>
+                    <ion-item lines="none" class="tc-field">
+                      <ion-input type="number" [(ngModel)]="selectedField.size"></ion-input>
+                    </ion-item>
+                  </div>
+                  <div>
+                    <label class="tc-label">Alinhamento</label>
+                    <ion-item lines="none" class="tc-field">
+                      <ion-select interface="popover" [(ngModel)]="selectedField.align">
+                        <ion-select-option value="center">Centro</ion-select-option>
+                        <ion-select-option value="left">Esquerda</ion-select-option>
+                        <ion-select-option value="right">Direita</ion-select-option>
+                      </ion-select>
+                    </ion-item>
+                  </div>
+                </div>
+
+                <div class="admin__row">
+                  <div>
+                    <label class="tc-label">Largura máxima (px)</label>
+                    <ion-item lines="none" class="tc-field">
+                      <ion-input type="number" placeholder="sem limite"
+                                 [(ngModel)]="selectedField.max_width"></ion-input>
+                    </ion-item>
+                  </div>
+                  <div>
+                    <label class="tc-label">Máx. de linhas</label>
+                    <ion-item lines="none" class="tc-field">
+                      <ion-select interface="popover" [(ngModel)]="selectedField.max_lines">
+                        <ion-select-option [value]="1">1 linha</ion-select-option>
+                        <ion-select-option [value]="2">2 linhas</ion-select-option>
+                        <ion-select-option [value]="3">3 linhas</ion-select-option>
+                      </ion-select>
+                    </ion-item>
+                  </div>
+                </div>
+
+                <!-- Só faz sentido em nome de pessoa -->
+                <ion-item lines="none" class="tc-field"
+                          *ngIf="selectedField.key === 'student_name'">
+                  <ion-toggle [(ngModel)]="selectedField.abbreviate_middle">
+                    Abreviar nomes do meio se faltar espaço
+                  </ion-toggle>
+                </ion-item>
+
+                <p class="editor__hint">
+                  Com alinhamento ao centro, X é o deslocamento a partir do meio
+                  da arte. Y negativo conta a partir da base.
+                </p>
+
+                <p class="editor__hint" *ngIf="selectedField.key === 'student_name'">
+                  Nome que não couber na largura máxima primeiro diminui de
+                  corpo, depois quebra em linha e só então abrevia o meio
+                  (Maria A. da C. Silva Junior). O sobrenome nunca é cortado —
+                  o certificado é conferido contra o documento do aluno.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div class="admin__form-actions">
+            <ion-button class="tc-btn" (click)="saveTemplate()" [disabled]="savingTemplate">
+              <ion-spinner *ngIf="savingTemplate" name="crescent" slot="start"></ion-spinner>
+              Salvar modelo
+            </ion-button>
+            <ion-button fill="clear" (click)="templateForm = null">Cancelar</ion-button>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <!-- ================= CERTIFICADOS ================= -->
+    <section *ngIf="tab === 'certificates' && !loading">
+      <h1 class="tc-section-title">Certificados emitidos</h1>
+      <p class="tc-section-sub">Últimos 500 certificados.</p>
+
+      <div class="admin__table-wrap">
+        <table class="admin__table">
+          <thead>
+            <tr>
+              <th>Código</th><th>Aluno</th><th>Curso</th>
+              <th>Instituição</th><th>Emitido</th><th>Situação</th><th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let cert of certificates">
+              <td><code>{{ cert.verification_code }}</code></td>
+              <td>{{ cert.student_name }}</td>
+              <td class="admin__cell-wide">{{ cert.course_title }}</td>
+              <td>{{ cert.institution_name }} · {{ cert.workload_hours }}h</td>
+              <td>{{ helper.formatDate(cert.issued_at) }}</td>
+              <td>
+                <span class="tc-tag"
+                      [ngClass]="cert.status === 'active' ? 'tc-tag--issued'
+                               : cert.status === 'revoked' ? 'tc-tag--failed' : 'tc-tag--waiting'">
+                  {{ cert.status === 'active' ? 'Válido'
+                   : cert.status === 'revoked' ? 'Revogado' : 'Aguardando pagamento' }}
+                </span>
+              </td>
+              <td>
+                <ion-button *ngIf="cert.status === 'active'" size="small" fill="clear"
+                            color="danger" (click)="revoke(cert)">Revogar</ion-button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ================= PAGAMENTOS ================= -->
+    <section *ngIf="tab === 'payments' && !loading">
+      <h1 class="tc-section-title">Pagamentos</h1>
+      <p class="tc-section-sub">Últimos 200 pagamentos registrados.</p>
+
+      <div class="admin__table-wrap">
+        <table class="admin__table">
+          <thead>
+            <tr>
+              <th>Data</th><th>Cliente</th><th>Tipo</th>
+              <th>Forma</th><th>Valor</th><th>Situação</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let payment of payments">
+              <td>{{ helper.formatDateTime(payment.created_at) }}</td>
+              <td>{{ payment.email }}</td>
+              <td>{{ payment.kind === 'premium' ? 'Premium' : 'Certificado' }}</td>
+              <td>{{ payment.method === 'pix' ? 'Pix' : 'Cartão' }}</td>
+              <td>{{ helper.formatMoney(payment.amount_cents) }}</td>
+              <td>
+                <span class="tc-tag"
+                      [ngClass]="payment.status === 'approved' ? 'tc-tag--issued'
+                               : payment.status === 'rejected' ? 'tc-tag--failed' : 'tc-tag--waiting'">
+                  {{ payment.status }}
+                </span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+</ion-content>

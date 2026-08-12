@@ -1,0 +1,336 @@
+.admin__tabs {
+  --background: var(--tc-surface-sunken);
+  margin-bottom: var(--tc-space-5);
+  border-radius: var(--tc-radius-sm);
+}
+
+.admin__skeleton { height: 240px; }
+
+.admin__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--tc-space-4);
+}
+
+.admin__grid {
+  display: grid;
+  gap: var(--tc-space-4);
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr));
+}
+
+.admin__item-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--tc-space-3);
+  margin-bottom: var(--tc-space-2);
+}
+
+.admin__item-head .tc-card__title { margin: 0; }
+
+.admin__url {
+  font-family: var(--tc-font-mono);
+  font-size: var(--tc-text-xs);
+  color: var(--tc-brand);
+  margin: 0 0 var(--tc-space-2);
+  word-break: break-all;
+}
+
+.admin__warn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: var(--tc-text-xs);
+  color: var(--tc-wait);
+  background: var(--tc-wait-soft);
+  border-radius: var(--tc-radius-sm);
+  padding: var(--tc-space-2);
+  margin: var(--tc-space-3) 0 0;
+}
+
+.admin__actions {
+  display: flex;
+  gap: var(--tc-space-2);
+  margin-top: var(--tc-space-4);
+}
+
+.admin__row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--tc-space-3);
+}
+
+.admin__color {
+  width: 38px;
+  height: 30px;
+  border: none;
+  background: none;
+  padding: 0;
+  cursor: pointer;
+}
+
+.admin__upload {
+  margin: var(--tc-space-4) 0;
+}
+
+.admin__upload input[type='file'] {
+  font-size: var(--tc-text-sm);
+  color: var(--tc-ink-soft);
+}
+
+.admin__form-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--tc-space-2);
+  margin-top: var(--tc-space-4);
+}
+
+/* --- tabelas -------------------------------------------------------------- */
+
+/* Tabela larga rola dentro do próprio container; a página nunca rola na
+   horizontal. */
+.admin__table-wrap {
+  overflow-x: auto;
+  border: 1px solid var(--tc-line);
+  border-radius: var(--tc-radius);
+  background: var(--tc-surface);
+}
+
+.admin__table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--tc-text-sm);
+  min-width: 760px;
+}
+
+.admin__table th,
+.admin__table td {
+  padding: var(--tc-space-3) var(--tc-space-4);
+  text-align: start;
+  border-bottom: 1px solid var(--tc-line);
+  white-space: nowrap;
+}
+
+.admin__table th {
+  font-size: var(--tc-text-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--tc-ink-faint);
+  background: var(--tc-surface-sunken);
+}
+
+.admin__table tr:last-child td { border-bottom: none; }
+
+.admin__table code {
+  font-family: var(--tc-font-mono);
+  font-size: var(--tc-text-xs);
+}
+
+.admin__cell-wide {
+  max-width: 260px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* --- editor de layout ----------------------------------------------------- */
+
+.editor {
+  display: grid;
+  gap: var(--tc-space-5);
+  align-items: start;
+}
+
+@media (min-width: 1000px) {
+  .editor { grid-template-columns: minmax(0, 1fr) 380px; }
+}
+
+.editor__canvas {
+  position: relative;
+  border: 1px solid var(--tc-line);
+  border-radius: var(--tc-radius);
+  overflow: hidden;
+  background: var(--tc-surface-sunken);
+}
+
+.editor__bg {
+  display: block;
+  width: 100%;
+  height: auto;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+/* Prévia fiel: o texto aparece com o corpo real, na escala da arte. Só um
+   contorno leve no hover/seleção, para não competir com o que está sendo
+   avaliado — que é o encaixe do texto na arte. */
+.editor__field-preview {
+  position: absolute;
+  /* touch-action none: sem isso o navegador rola a página em vez de deixar
+     arrastar o campo no celular. */
+  touch-action: none;
+  user-select: none;
+  cursor: grab;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: none;
+  border: 1px dashed transparent;
+  border-radius: 3px;
+  padding: 0;
+  margin: 0;
+  cursor: pointer;
+  white-space: nowrap;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 700;
+  text-align: center;
+  line-height: 1.15;
+}
+
+.editor__field-preview:hover {
+  border-color: rgba(20, 75, 166, 0.5);
+}
+
+.editor__field-preview--active {
+  border-color: var(--tc-brand);
+  background: rgba(20, 75, 166, 0.08);
+}
+
+.editor__field-preview:active { cursor: grabbing; }
+
+.editor__field-line { display: block; }
+
+/* A etiqueta com o nome do campo só aparece no hover/seleção: fora disso ela
+   tampava justamente o texto que se quer conferir. */
+.editor__field-tag {
+  display: none;
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  margin-bottom: 2px;
+  background: var(--tc-brand);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1.4;
+  padding: 1px 6px;
+  border-radius: 3px;
+  white-space: nowrap;
+}
+
+.editor__field-preview:hover .editor__field-tag,
+.editor__field-preview--active .editor__field-tag { display: block; }
+
+/* Guia da largura máxima: mostra até onde o texto pode crescer antes de
+   encolher ou quebrar. */
+.editor__maxwidth {
+  position: absolute;
+  height: 0;
+  border-top: 2px dashed rgba(180, 35, 24, 0.55);
+  pointer-events: none;
+}
+
+.editor__canvas-info {
+  font-size: var(--tc-text-sm);
+  color: var(--tc-ink-soft);
+  margin: 0 0 var(--tc-space-4);
+}
+
+.editor__canvas-info strong {
+  font-family: var(--tc-font-mono);
+  color: var(--tc-ink);
+}
+
+/* Leitura das coordenadas enquanto arrasta. */
+.editor__canvas-info--live {
+  background: var(--tc-brand-soft);
+  border-radius: var(--tc-radius-sm);
+  padding: var(--tc-space-2) var(--tc-space-3);
+  color: var(--tc-brand);
+}
+
+.editor__qr {
+  position: absolute;
+  touch-action: none;
+  user-select: none;
+  cursor: grab;
+  aspect-ratio: 1;
+  border: 2px dashed var(--tc-brand);
+  border-radius: 4px;
+  display: grid;
+  place-items: center;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--tc-brand);
+  background: rgba(255, 255, 255, 0.7);
+}
+
+.editor__placeholder {
+  display: grid;
+  place-items: center;
+  gap: var(--tc-space-2);
+  aspect-ratio: 1439 / 1018;
+  border: 1px dashed var(--tc-line-strong);
+  border-radius: var(--tc-radius);
+  color: var(--tc-ink-faint);
+  text-align: center;
+  padding: var(--tc-space-4);
+}
+
+.editor__placeholder ion-icon { font-size: 40px; }
+
+.editor__side {
+  display: grid;
+  gap: var(--tc-space-4);
+}
+
+.editor__fields {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 var(--tc-space-3);
+  display: grid;
+  gap: 4px;
+}
+
+.editor__field {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px var(--tc-space-3);
+  border: 1px solid var(--tc-line);
+  border-radius: var(--tc-radius-sm);
+  font-size: var(--tc-text-sm);
+  cursor: pointer;
+}
+
+.editor__field--active {
+  border-color: var(--tc-brand);
+  background: var(--tc-brand-soft);
+  font-weight: 700;
+}
+
+.editor__tuner {
+  margin-top: var(--tc-space-4);
+  padding-top: var(--tc-space-4);
+  border-top: 1px solid var(--tc-line);
+}
+
+.editor__tuner-title {
+  font-size: var(--tc-text-sm);
+  margin: 0 0 var(--tc-space-3);
+}
+
+.editor__nudge {
+  display: flex;
+  gap: 4px;
+  margin-bottom: var(--tc-space-3);
+}
+
+.editor__hint {
+  font-size: var(--tc-text-xs);
+  color: var(--tc-ink-faint);
+  line-height: 1.5;
+  margin: 0 0 var(--tc-space-3);
+}
