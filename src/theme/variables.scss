@@ -33,12 +33,16 @@
 
 :root {
   /* --- tinta e papel ------------------------------------------------------ */
-  /* Contraste conferido contra --tc-surface e --tc-paper pelo critério
-     WCAG AA (4.5:1 para texto normal). O valor original de --tc-ink-faint
-     (#7B8798) ficava em 3,4:1 e reprovava em legendas de 12px. */
-  --tc-ink:            #0E1726;  /* títulos e texto principal — 16.4:1 */
-  --tc-ink-soft:       #47556B;  /* texto secundário — 7.4:1 */
-  --tc-ink-faint:      #5F6B7D;  /* legendas, metadados — 5.4:1 */
+  /* Contraste conferido contra os três fundos que esses tons realmente
+     encontram — --tc-surface, --tc-paper e --tc-surface-sunken — e o número
+     anotado é sempre o PIOR dos três, não o mais favorável. A revisão
+     anterior tinha `--tc-ink-faint` anotado como 5,4:1, mas essa conta foi
+     feita só contra o branco puro: contra --tc-surface-sunken ela caía para
+     4,77:1, abaixo do mínimo de AA, e por isso a descrição dos cursos e
+     outras legendas ficavam claras demais para ler. */
+  --tc-ink:            #0E1726;  /* títulos e texto principal — 15.9:1 */
+  --tc-ink-soft:       #33415A;  /* texto secundário — 9.1:1 */
+  --tc-ink-faint:      #435067;  /* legendas, metadados — 7.2:1 */
 
   --tc-paper:          #F4F6F9;  /* fundo da página */
   --tc-surface:        #FFFFFF;  /* cards */
@@ -153,11 +157,11 @@
   --ion-color-danger-tint: #BC392F;
 
   --ion-color-medium: var(--tc-ink-soft);
-  --ion-color-medium-rgb: 71, 85, 107;
+  --ion-color-medium-rgb: 51, 65, 90;
   --ion-color-medium-contrast: #ffffff;
   --ion-color-medium-contrast-rgb: 255, 255, 255;
-  --ion-color-medium-shade: #3E4B5E;
-  --ion-color-medium-tint: #59667A;
+  --ion-color-medium-shade: #2D394F;
+  --ion-color-medium-tint: #47546A;
 
   --ion-color-light: var(--tc-surface-sunken);
   --ion-color-light-rgb: 238, 241, 246;
