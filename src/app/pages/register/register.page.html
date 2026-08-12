@@ -3,6 +3,20 @@
     <div class="auth__panel">
       <img class="auth__logo" src="assets/logomarca.png" alt="Cursando.Pro">
 
+      <!-- Desconto do link: só aparece depois que o servidor confirma a
+           campanha, para a tela nunca prometer um preço que não vale. -->
+      <div class="register__promo" *ngIf="referral">
+        <span class="register__promo-badge">
+          {{ referral.discount_percent }}% OFF
+        </span>
+        <p class="register__promo-text">
+          Você veio pelo link de <strong>{{ referral.label }}</strong> e tem
+          desconto na primeira mensalidade:
+          <s>{{ helper.formatMoney(referral.full_price_cents) }}</s>
+          <strong>{{ helper.formatMoney(referral.first_month_cents) }}</strong>
+        </p>
+      </div>
+
       <h1 class="auth__title">Criar sua conta</h1>
       <p class="auth__lead">
         Acesse os cursos e emita certificados com o nome da instituição.

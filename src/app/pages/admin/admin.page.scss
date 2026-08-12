@@ -334,3 +334,11 @@
   line-height: 1.5;
   margin: 0 0 var(--tc-space-3);
 }
+
+/* Ações da linha de link: os três botões ficam lado a lado sem quebrar. */
+.admin__row-actions {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  white-space: nowrap;
+}

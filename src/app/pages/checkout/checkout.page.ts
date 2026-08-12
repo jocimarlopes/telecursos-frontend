@@ -47,6 +47,9 @@ export class CheckoutPage implements OnInit, OnDestroy {
   amountCents = 0;
   loadingQuote = true;
 
+  /** Desconto do link de indicação, quando a cotação traz um. */
+  discount: any = null;
+
   // Campos do cartão. Ficam só na memória do componente e são trocados por um
   // token no navegador — o número nunca chega ao nosso backend.
   cardNumber = '';
@@ -108,6 +111,7 @@ export class CheckoutPage implements OnInit, OnDestroy {
       next: (res: any) => {
         this.loadingQuote = false;
         this.amountCents = res.amount_cents ?? 0;
+        this.discount = res.discount ?? null;
         this.installmentOptions = this.mp.installmentOptions(this.amountCents);
         if (this.canPayWithWallet) this.method = 'wallet';
       },

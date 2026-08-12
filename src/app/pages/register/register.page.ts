@@ -1,4 +1,5 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 import { ApiService } from 'src/app/services/api.service';
 import { HelperService } from 'src/app/services/helper.service';
 import { UserService } from 'src/app/services/user.service';
@@ -9,7 +10,7 @@ import { UserService } from 'src/app/services/user.service';
   styleUrls: ['./register.page.scss'],
   standalone: false,
 })
-export class RegisterPage {
+export class RegisterPage implements OnInit {
 
   name = '';
   lastname = '';
@@ -20,11 +21,35 @@ export class RegisterPage {
   submitting = false;
   error = '';
 
+  /** Campanha de influencer, quando a pessoa chega por /r/<slug>. */
+  referralSlug: string | null = null;
+  referral: any = null;
+
   constructor(
-    private helper: HelperService,
+    private route: ActivatedRoute,
+    public helper: HelperService,
     private user: UserService,
     private api: ApiService,
   ) { }
+
+  ngOnInit() {
+    this.referralSlug = this.route.snapshot.paramMap.get('slug');
+    if (this.referralSlug) this.loadReferral();
+  }
+
+  /**
+   * Confere o link antes de prometer desconto na tela.
+   *
+   * O slug vem da URL, então qualquer um pode inventar um: só mostramos a
+   * promoção depois que o servidor confirma que ela existe e está ativa — é
+   * o mesmo critério que o cadastro usa para gravar o vínculo.
+   */
+  private loadReferral() {
+    this.api.get(`api/discount-links/${this.referralSlug}`).subscribe({
+      next: (res: any) => { this.referral = res.link; },
+      error: () => { this.referral = null; },
+    });
+  }
 
   private validate(): string | null {
     if (!this.name.trim()) return 'Informe seu nome.';
@@ -45,6 +70,7 @@ export class RegisterPage {
       lastname: this.lastname.trim(),
       email: this.email.trim(),
       password: this.password,
+      referral_slug: this.referralSlug || undefined,
     }).subscribe({
       next: (res: any) => {
         this.submitting = false;

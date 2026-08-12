@@ -28,6 +28,12 @@ const routes: Routes = [
     path: 'cadastrar',
     loadChildren: () => import('./pages/register/register.module').then(m => m.RegisterPageModule),
   },
+  // Link de influencer: cai direto no cadastro, que resolve o desconto pelo
+  // slug. Caminho curto de propósito — é o que vai no story/bio.
+  {
+    path: 'r/:slug',
+    loadChildren: () => import('./pages/register/register.module').then(m => m.RegisterPageModule),
+  },
   {
     path: 'recuperar',
     loadChildren: () => import('./pages/recovery/recovery.module').then(m => m.RecoveryPageModule),

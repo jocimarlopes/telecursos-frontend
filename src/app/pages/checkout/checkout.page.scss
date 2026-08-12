@@ -86,3 +86,26 @@
   margin: 0;
   border-radius: var(--tc-radius-sm);
 }
+
+/* Desconto do link de influencer no resumo da compra. */
+.checkout__discount {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--tc-space-2);
+  margin: var(--tc-space-3) 0 0;
+  padding: var(--tc-space-3);
+  border-radius: var(--tc-radius-sm);
+  background: var(--tc-seal-soft);
+  color: var(--tc-ink);
+  font-size: var(--tc-text-sm);
+  line-height: 1.5;
+}
+
+.checkout__discount ion-icon {
+  flex: none;
+  font-size: 18px;
+  color: var(--tc-seal);
+  margin-top: 2px;
+}
+
+.checkout__discount s { color: var(--tc-ink-faint); }

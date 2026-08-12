@@ -10,6 +10,7 @@
       <ion-segment-button value="certificates"><ion-label>Certificados</ion-label></ion-segment-button>
       <ion-segment-button value="payments"><ion-label>Pagamentos</ion-label></ion-segment-button>
       <ion-segment-button value="users"><ion-label>Usuários</ion-label></ion-segment-button>
+      <ion-segment-button value="links"><ion-label>Links</ion-label></ion-segment-button>
     </ion-segment>
 
     <p class="auth__error" *ngIf="error" role="alert">{{ error }}</p>
@@ -588,6 +589,106 @@
             Adicionar
           </ion-button>
           <ion-button fill="clear" (click)="creditForm = null">Cancelar</ion-button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= LINKS DE DESCONTO ================= -->
+    <section *ngIf="tab === 'links' && !loading && !linkForm">
+      <div class="admin__head">
+        <div>
+          <h1 class="tc-section-title">Links de desconto</h1>
+          <p class="tc-section-sub">
+            Cada influencer divulga o seu. Quem se cadastra por ele paga a
+            primeira mensalidade com desconto.
+          </p>
+        </div>
+        <ion-button class="tc-btn" (click)="newLink()">
+          <ion-icon slot="start" name="add-outline"></ion-icon>
+          Novo link
+        </ion-button>
+      </div>
+
+      <div class="admin__table-wrap">
+        <table class="admin__table">
+          <thead>
+            <tr>
+              <th>Campanha</th><th>Endereço</th><th>Desconto</th>
+              <th>1º mês sai por</th><th>Cadastros</th><th>Situação</th><th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let link of links">
+              <td>{{ link.label }}</td>
+              <td><code>/r/{{ link.slug }}</code></td>
+              <td>{{ link.discount_percent }}%</td>
+              <td>{{ helper.formatMoney(discountedPrice(link.discount_percent)) }}</td>
+              <td>{{ link.signups }}</td>
+              <td>
+                <span class="tc-tag" [ngClass]="link.active ? 'tc-tag--issued' : 'tc-tag--muted'">
+                  {{ link.active ? 'Ativo' : 'Inativo' }}
+                </span>
+              </td>
+              <td class="admin__row-actions">
+                <ion-button size="small" fill="clear" (click)="copyLink(link)">Copiar</ion-button>
+                <ion-button size="small" fill="outline" class="tc-btn"
+                            (click)="editLink(link)">Editar</ion-button>
+                <ion-button size="small" fill="clear" color="danger"
+                            (click)="deleteLink(link)">Apagar</ion-button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p class="tc-section-sub" *ngIf="!links.length">
+        Nenhum link ainda. Crie o primeiro para começar uma campanha.
+      </p>
+    </section>
+
+    <!-- formulário de link -->
+    <section class="tc-card" *ngIf="linkForm">
+      <div class="tc-card__body">
+        <h1 class="tc-section-title">
+          {{ linkForm.uid ? 'Editar link' : 'Novo link de desconto' }}
+        </h1>
+
+        <label class="tc-label" for="llabel">Campanha</label>
+        <ion-item lines="none" class="tc-field">
+          <ion-input id="llabel" placeholder="Doutora" [(ngModel)]="linkForm.label"
+                     name="label"></ion-input>
+        </ion-item>
+
+        <label class="tc-label" for="lslug">Endereço do link</label>
+        <ion-item lines="none" class="tc-field">
+          <ion-note slot="start">/r/</ion-note>
+          <ion-input id="lslug" placeholder="doutora" [(ngModel)]="linkForm.slug"
+                     name="slug" autocapitalize="off"></ion-input>
+        </ion-item>
+
+        <label class="tc-label" for="lpercent">Desconto na primeira mensalidade (%)</label>
+        <ion-item lines="none" class="tc-field">
+          <ion-input id="lpercent" type="number" inputmode="numeric" placeholder="50"
+                     [(ngModel)]="linkForm.discount_percent" name="discount_percent"></ion-input>
+        </ion-item>
+        <p class="tc-section-sub" *ngIf="fullPriceCents">
+          De {{ helper.formatMoney(fullPriceCents) }} por
+          <strong>{{ helper.formatMoney(discountedPrice(linkForm.discount_percent)) }}</strong>
+          na primeira mensalidade. Depois, preço cheio.
+        </p>
+
+        <ion-item lines="none" class="tc-field">
+          <ion-toggle [(ngModel)]="linkForm.active" name="active">Link ativo</ion-toggle>
+        </ion-item>
+
+        <p class="auth__error" *ngIf="error" role="alert">{{ error }}</p>
+
+        <div class="admin__form-actions">
+          <ion-button class="tc-btn" (click)="saveLink()" [disabled]="savingLink">
+            <ion-spinner *ngIf="savingLink" name="crescent" slot="start"></ion-spinner>
+            Salvar
+          </ion-button>
+          <ion-button fill="clear" (click)="linkForm = null">Cancelar</ion-button>
         </div>
       </div>
     </section>

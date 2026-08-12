@@ -63,6 +63,16 @@
             <ion-skeleton-text *ngIf="loadingQuote" animated
                                class="checkout__price-loading"></ion-skeleton-text>
           </div>
+          <p class="checkout__discount" *ngIf="discount">
+            <ion-icon name="pricetag-outline"></ion-icon>
+            <span>
+              Desconto de {{ discount.discount_percent }}% pelo link de
+              <strong>{{ discount.label }}</strong> —
+              de <s>{{ helper.formatMoney(discount.full_price_cents) }}</s>
+              nesta primeira mensalidade.
+            </span>
+          </p>
+
           <p class="checkout__line-note" *ngIf="isCertificate">
             Assim que o pagamento for confirmado, o certificado fica disponível
             para baixar em Meus certificados.

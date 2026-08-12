@@ -4,7 +4,7 @@ import { HelperService } from 'src/app/services/helper.service';
 import { UserService } from 'src/app/services/user.service';
 import { environment } from 'src/environments/environment';
 
-type Tab = 'institutions' | 'templates' | 'certificates' | 'payments' | 'users';
+type Tab = 'institutions' | 'templates' | 'certificates' | 'payments' | 'users' | 'links';
 
 const FIELD_LABELS: Record<string, string> = {
   student_name: 'Nome do aluno',
@@ -33,6 +33,10 @@ export class AdminPage implements OnInit {
   certificates: any[] = [];
   payments: any[] = [];
   users: any[] = [];
+  links: any[] = [];
+
+  /** Preço cheio da mensalidade, para mostrar quanto fica com cada desconto. */
+  fullPriceCents = 0;
 
   // --- formulário de instituição ---
   institutionForm: any = null;
@@ -41,6 +45,10 @@ export class AdminPage implements OnInit {
   // --- crédito de usuário ---
   creditForm: any = null;
   savingCredit = false;
+
+  // --- link de desconto ---
+  linkForm: any = null;
+  savingLink = false;
 
   // --- editor de modelo ---
   templateForm: any = null;
@@ -76,6 +84,7 @@ export class AdminPage implements OnInit {
       certificates: 'api/admin/certificates',
       payments: 'api/admin/payments',
       users: 'api/admin/users',
+      links: 'api/admin/discount-links',
     };
 
     this.api.get(routes[tab], this.token).subscribe({
@@ -86,6 +95,8 @@ export class AdminPage implements OnInit {
         this.certificates = res.certificates ?? this.certificates;
         this.payments = res.payments ?? this.payments;
         this.users = res.users ?? this.users;
+        this.links = res.links ?? this.links;
+        this.fullPriceCents = res.full_price_cents ?? this.fullPriceCents;
       },
       error: () => {
         this.loading = false;
@@ -633,5 +644,83 @@ export class AdminPage implements OnInit {
         this.error = err?.error?.message || 'Não foi possível adicionar o crédito.';
       },
     });
+  }
+
+  // =========================================================================
+  // links de desconto
+  // =========================================================================
+
+  newLink() {
+    this.error = '';
+    this.linkForm = { uid: null, slug: '', label: '', discount_percent: 50, active: true };
+  }
+
+  editLink(link: any) {
+    this.error = '';
+    this.linkForm = { ...link };
+  }
+
+  /** Endereço completo que a influencer divulga. */
+  linkUrl(slug: string): string {
+    return `${window.location.origin}/r/${slug}`;
+  }
+
+  copyLink(link: any) {
+    this.helper.copyToClipboard(this.linkUrl(link.slug), 'Link copiado', 2000);
+  }
+
+  /** Quanto a pessoa paga na primeira mensalidade com este desconto. */
+  discountedPrice(percent: number): number {
+    return Math.round(this.fullPriceCents * (100 - (percent || 0)) / 100);
+  }
+
+  saveLink() {
+    this.error = '';
+    this.savingLink = true;
+
+    const form = this.linkForm;
+    const request = form.uid
+      ? this.api.put(`api/admin/discount-links/${form.uid}`, form, this.token)
+      : this.api.post('api/admin/discount-links', form, this.token);
+
+    request.subscribe({
+      next: (res: any) => {
+        this.savingLink = false;
+        if (!res.status) {
+          this.error = (res.errors || []).join(' ');
+          return;
+        }
+        this.linkForm = null;
+        this.helper.message('Link salvo', 2500, 'success');
+        this.switchTab('links');
+      },
+      error: (err) => {
+        this.savingLink = false;
+        this.error = (err?.error?.errors || []).join(' ')
+          || err?.error?.message || 'Não foi possível salvar.';
+      },
+    });
+  }
+
+  async deleteLink(link: any) {
+    await this.helper.alerta(
+      `Apagar o link "${link.slug}"?`, '',
+      'O endereço para de funcionar na hora. Quem já se cadastrou por ele não é afetado.',
+      [
+        { text: 'Cancelar', role: 'cancel' },
+        {
+          text: 'Apagar', role: 'destructive',
+          handler: () => {
+            this.api.delete(`api/admin/discount-links/${link.uid}`, this.token).subscribe({
+              next: () => {
+                this.helper.message('Link apagado', 2500, 'success');
+                this.switchTab('links');
+              },
+              error: () => this.helper.message('Não foi possível apagar.', 3000, 'danger'),
+            });
+          },
+        },
+      ],
+    );
   }
 }

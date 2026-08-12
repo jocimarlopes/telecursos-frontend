@@ -7,3 +7,39 @@
 @media (min-width: 420px) {
   .register__row { grid-template-columns: 1fr 1fr; }
 }
+
+/* Faixa da campanha de influencer. Verde é a cor de "confirmado" no resto do
+   produto, e aqui ela marca um desconto que o servidor já validou. */
+.register__promo {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--tc-space-3);
+  padding: var(--tc-space-3) var(--tc-space-4);
+  margin-bottom: var(--tc-space-5);
+  border: 1px solid rgba(11, 122, 75, 0.24);
+  border-radius: var(--tc-radius);
+  background: var(--tc-seal-soft);
+}
+
+.register__promo-badge {
+  flex: none;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: var(--tc-seal);
+  color: #fff;
+  font-size: var(--tc-text-xs);
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.register__promo-text {
+  margin: 0;
+  font-size: var(--tc-text-sm);
+  line-height: 1.5;
+  color: var(--tc-ink);
+}
+
+.register__promo-text s {
+  color: var(--tc-ink-faint);
+  margin-right: 4px;
+}
