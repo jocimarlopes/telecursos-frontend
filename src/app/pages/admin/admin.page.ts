@@ -4,7 +4,7 @@ import { HelperService } from 'src/app/services/helper.service';
 import { UserService } from 'src/app/services/user.service';
 import { environment } from 'src/environments/environment';
 
-type Tab = 'institutions' | 'templates' | 'certificates' | 'payments';
+type Tab = 'institutions' | 'templates' | 'certificates' | 'payments' | 'users';
 
 const FIELD_LABELS: Record<string, string> = {
   student_name: 'Nome do aluno',
@@ -32,10 +32,15 @@ export class AdminPage implements OnInit {
   templates: any[] = [];
   certificates: any[] = [];
   payments: any[] = [];
+  users: any[] = [];
 
   // --- formulário de instituição ---
   institutionForm: any = null;
   savingInstitution = false;
+
+  // --- crédito de usuário ---
+  creditForm: any = null;
+  savingCredit = false;
 
   // --- editor de modelo ---
   templateForm: any = null;
@@ -70,6 +75,7 @@ export class AdminPage implements OnInit {
       templates: 'api/admin/certificate-templates',
       certificates: 'api/admin/certificates',
       payments: 'api/admin/payments',
+      users: 'api/admin/users',
     };
 
     this.api.get(routes[tab], this.token).subscribe({
@@ -79,6 +85,7 @@ export class AdminPage implements OnInit {
         this.templates = res.templates ?? this.templates;
         this.certificates = res.certificates ?? this.certificates;
         this.payments = res.payments ?? this.payments;
+        this.users = res.users ?? this.users;
       },
       error: () => {
         this.loading = false;
@@ -579,5 +586,52 @@ export class AdminPage implements OnInit {
         },
       ],
     );
+  }
+
+  // =========================================================================
+  // créditos
+  // =========================================================================
+
+  openCreditForm(user: any) {
+    this.error = '';
+    this.creditForm = {
+      user_uid: user.uid,
+      user_label: `${user.name || ''} ${user.lastname || ''}`.trim() || user.email,
+      amount: '',
+      description: '',
+    };
+  }
+
+  saveCredit() {
+    this.error = '';
+    // Aceita "30" ou "30,00" — o mesmo formato que formatMoney exibe.
+    const amountCents = Math.round(
+      parseFloat(String(this.creditForm.amount).replace(',', '.')) * 100);
+
+    if (!amountCents || amountCents <= 0) {
+      this.error = 'Informe um valor maior que zero.';
+      return;
+    }
+
+    this.savingCredit = true;
+    this.api.post(`api/admin/users/${this.creditForm.user_uid}/credits`, {
+      amount_cents: amountCents,
+      description: this.creditForm.description || undefined,
+    }, this.token).subscribe({
+      next: (res: any) => {
+        this.savingCredit = false;
+        if (!res.status) {
+          this.error = res.message;
+          return;
+        }
+        this.creditForm = null;
+        this.helper.message('Crédito adicionado', 2500, 'success');
+        this.switchTab('users');
+      },
+      error: (err) => {
+        this.savingCredit = false;
+        this.error = err?.error?.message || 'Não foi possível adicionar o crédito.';
+      },
+    });
   }
 }

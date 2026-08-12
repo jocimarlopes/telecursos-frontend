@@ -9,6 +9,7 @@
       <ion-segment-button value="templates"><ion-label>Modelos</ion-label></ion-segment-button>
       <ion-segment-button value="certificates"><ion-label>Certificados</ion-label></ion-segment-button>
       <ion-segment-button value="payments"><ion-label>Pagamentos</ion-label></ion-segment-button>
+      <ion-segment-button value="users"><ion-label>Usuários</ion-label></ion-segment-button>
     </ion-segment>
 
     <p class="auth__error" *ngIf="error" role="alert">{{ error }}</p>
@@ -503,8 +504,11 @@
             <tr *ngFor="let payment of payments">
               <td>{{ helper.formatDateTime(payment.created_at) }}</td>
               <td>{{ payment.email }}</td>
-              <td>{{ payment.kind === 'premium' ? 'Premium' : 'Certificado' }}</td>
-              <td>{{ payment.method === 'pix' ? 'Pix' : 'Cartão' }}</td>
+              <td>{{ payment.kind === 'premium' ? 'Assinatura'
+                     : payment.kind === 'credit_topup' ? 'Recarga de saldo'
+                     : 'Certificado' }}</td>
+              <td>{{ payment.method === 'pix' ? 'Pix'
+                     : payment.method === 'wallet' ? 'Saldo' : 'Cartão' }}</td>
               <td>{{ helper.formatMoney(payment.amount_cents) }}</td>
               <td>
                 <span class="tc-tag"
@@ -516,6 +520,75 @@
             </tr>
           </tbody>
         </table>
+      </div>
+    </section>
+
+    <!-- ================= USUÁRIOS ================= -->
+    <section *ngIf="tab === 'users' && !loading && !creditForm">
+      <h1 class="tc-section-title">Usuários cadastrados</h1>
+      <p class="tc-section-sub">
+        Adicione crédito manualmente — útil para promoções e ajustes.
+      </p>
+
+      <div class="admin__table-wrap">
+        <table class="admin__table">
+          <thead>
+            <tr>
+              <th>Nome</th><th>E-mail</th><th>Papel</th>
+              <th>Assinatura</th><th>Saldo</th><th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let u of users">
+              <td>{{ u.name }} {{ u.lastname }}</td>
+              <td>{{ u.email }}</td>
+              <td>{{ u.role === 'admin' ? 'Admin' : 'Aluno' }}</td>
+              <td>
+                <span class="tc-tag"
+                      [ngClass]="u.subscription?.plan === 'lifetime' ? 'tc-tag--issued'
+                               : u.subscription?.active ? 'tc-tag--issued' : 'tc-tag--muted'">
+                  {{ u.subscription?.plan === 'lifetime' ? 'Vitalício'
+                     : u.subscription?.active ? 'Ativa' : 'Sem assinatura' }}
+                </span>
+              </td>
+              <td>{{ helper.formatMoney(u.credit_balance_cents) }}</td>
+              <td>
+                <ion-button size="small" fill="outline" class="tc-btn"
+                            (click)="openCreditForm(u)">Adicionar crédito</ion-button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- formulário de crédito -->
+    <section class="tc-card" *ngIf="creditForm">
+      <div class="tc-card__body">
+        <h1 class="tc-section-title">Adicionar crédito</h1>
+        <p class="tc-section-sub">{{ creditForm.user_label }}</p>
+
+        <label class="tc-label" for="camount">Valor (R$)</label>
+        <ion-item lines="none" class="tc-field">
+          <ion-input id="camount" inputmode="decimal" placeholder="30,00"
+                     [(ngModel)]="creditForm.amount" name="amount"></ion-input>
+        </ion-item>
+
+        <label class="tc-label" for="cdesc">Motivo (opcional)</label>
+        <ion-item lines="none" class="tc-field">
+          <ion-input id="cdesc" placeholder="Promoção de aniversário"
+                     [(ngModel)]="creditForm.description" name="description"></ion-input>
+        </ion-item>
+
+        <p class="auth__error" *ngIf="error" role="alert">{{ error }}</p>
+
+        <div class="admin__form-actions">
+          <ion-button class="tc-btn" (click)="saveCredit()" [disabled]="savingCredit">
+            <ion-spinner *ngIf="savingCredit" name="crescent" slot="start"></ion-spinner>
+            Adicionar
+          </ion-button>
+          <ion-button fill="clear" (click)="creditForm = null">Cancelar</ion-button>
+        </div>
       </div>
     </section>
   </div>

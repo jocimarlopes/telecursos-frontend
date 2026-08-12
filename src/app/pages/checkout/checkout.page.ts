@@ -5,7 +5,8 @@ import { HelperService } from 'src/app/services/helper.service';
 import { UserService } from 'src/app/services/user.service';
 import { MercadoPagoService } from 'src/app/services/mercadopago.service';
 
-type Method = 'pix' | 'card';
+type Method = 'pix' | 'card' | 'wallet';
+type Kind = 'certificate' | 'premium' | 'credit_topup';
 
 @Component({
   selector: 'app-checkout',
@@ -16,9 +17,17 @@ type Method = 'pix' | 'card';
 export class CheckoutPage implements OnInit, OnDestroy {
 
   method: Method = 'pix';
+  kind: Kind = 'premium';
 
   /** Preenchido quando a compra é de um certificado avulso. */
   certificateUid: string | null = null;
+
+  /** Valor escolhido pela pessoa numa recarga — o backend confere o piso/teto. */
+  topupAmountCents = 0;
+
+  /** Saldo atual, para oferecer "pagar com saldo" quando ele cobrir o valor. */
+  walletBalanceCents = 0;
+  payingWithWallet = false;
 
   cpf = '';
   cpfTouched = false;
@@ -58,6 +67,17 @@ export class CheckoutPage implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.certificateUid = this.route.snapshot.queryParamMap.get('certificado');
+    const kindParam = this.route.snapshot.queryParamMap.get('kind');
+    if (this.certificateUid) this.kind = 'certificate';
+    else if (kindParam === 'credit_topup') this.kind = 'credit_topup';
+    else this.kind = 'premium';
+
+    if (this.isTopup) {
+      this.topupAmountCents = Number(this.route.snapshot.queryParamMap.get('amount')) || 0;
+    } else {
+      this.loadWallet();
+    }
+
     this.loadQuote();
     this.cpf = this.helper.formatCpf(this.user.getUserData()?.cpf || '');
     this.restorePendingPix();
@@ -80,13 +100,16 @@ export class CheckoutPage implements OnInit, OnDestroy {
     this.loadingQuote = true;
     const params = this.isCertificate
       ? `?kind=certificate&certificate_uid=${this.certificateUid}`
-      : '?kind=premium';
+      : this.isTopup
+        ? `?kind=credit_topup&amount_cents=${this.topupAmountCents}`
+        : '?kind=premium';
 
     this.api.get(`api/payments/quote${params}`, this.user.getToken()).subscribe({
       next: (res: any) => {
         this.loadingQuote = false;
         this.amountCents = res.amount_cents ?? 0;
         this.installmentOptions = this.mp.installmentOptions(this.amountCents);
+        if (this.canPayWithWallet) this.method = 'wallet';
       },
       error: (err) => {
         this.loadingQuote = false;
@@ -96,13 +119,42 @@ export class CheckoutPage implements OnInit, OnDestroy {
     });
   }
 
+  /** Saldo consultado sempre fresco — mostra "pagar com saldo" quando cobrir
+   * o valor. Não faz sentido perguntar pra uma recarga (ela existe para
+   * ABASTECER o saldo, não para ser paga por ele). */
+  private loadWallet() {
+    this.api.get('api/wallet', this.user.getToken()).subscribe({
+      next: (res: any) => {
+        this.walletBalanceCents = res.balance_cents ?? 0;
+        if (this.canPayWithWallet) this.method = 'wallet';
+      },
+      error: () => { this.walletBalanceCents = 0; },
+    });
+  }
+
   get isCertificate(): boolean {
     return !!this.certificateUid;
   }
 
+  get isTopup(): boolean {
+    return this.kind === 'credit_topup';
+  }
+
+  get canPayWithWallet(): boolean {
+    return !this.isTopup && this.amountCents > 0 && this.walletBalanceCents >= this.amountCents;
+  }
+
+  /** Corpo comum a pix, cartão e saldo — o que muda é só a forma de cobrar. */
+  private purchaseBody(): any {
+    const purchase: any = { kind: this.kind };
+    if (this.isCertificate) purchase.certificate_uid = this.certificateUid;
+    if (this.isTopup) purchase.amount_cents = this.topupAmountCents;
+    return purchase;
+  }
+
   /** Bloqueia o checkout só quando não há nada a pagar agora. */
   get accessBlocked(): boolean {
-    if (this.isCertificate) return false;
+    if (this.isCertificate || this.isTopup) return false;
     if (this.user.isLifetime) return true;
     return this.user.isPremium && !(this.subscription?.can_renew ?? true);
   }
@@ -165,8 +217,7 @@ export class CheckoutPage implements OnInit, OnDestroy {
     this.submitting = true;
     this.api.post('api/payments/pix', {
       cpf: this.cpf,
-      kind: this.isCertificate ? 'certificate' : 'premium',
-      certificate_uid: this.certificateUid,
+      ...this.purchaseBody(),
     }, this.user.getToken()).subscribe({
       next: (res: any) => {
         this.submitting = false;
@@ -283,8 +334,7 @@ export class CheckoutPage implements OnInit, OnDestroy {
         payment_method_id: card.payment_method_id,
         installments: this.installments,
         cpf: this.cpf,
-        kind: this.isCertificate ? 'certificate' : 'premium',
-        certificate_uid: this.certificateUid,
+        ...this.purchaseBody(),
       }, this.user.getToken()).subscribe({
         next: (res: any) => {
           this.submitting = false;
@@ -302,6 +352,24 @@ export class CheckoutPage implements OnInit, OnDestroy {
     }
   }
 
+  // --- saldo -------------------------------------------------------------
+
+  payWithWallet() {
+    this.error = '';
+    this.payingWithWallet = true;
+    this.api.post('api/payments/wallet', this.purchaseBody(), this.user.getToken()).subscribe({
+      next: (res: any) => {
+        this.payingWithWallet = false;
+        if (res.approved) return this.onApproved(res);
+        this.error = res.message;
+      },
+      error: (err) => {
+        this.payingWithWallet = false;
+        this.error = err?.error?.message || 'Não foi possível pagar com o saldo.';
+      },
+    });
+  }
+
   // --- conclusão -------------------------------------------------------------
 
   private onApproved(res: any) {
@@ -309,7 +377,8 @@ export class CheckoutPage implements OnInit, OnDestroy {
     sessionStorage.removeItem('pix');
     if (res.token) this.user.setToken(res.token);
 
-    this.helper.message('Pagamento aprovado!', 3000, 'success');
-    this.helper.goToPage(this.isCertificate ? '/certificados' : '/home');
+    this.helper.message(this.isTopup ? 'Saldo adicionado!' : 'Pagamento aprovado!', 3000, 'success');
+    this.helper.goToPage(
+      this.isCertificate ? '/certificados' : this.isTopup ? '/perfil' : '/home');
   }
 }

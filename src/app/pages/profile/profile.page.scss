@@ -117,3 +117,28 @@
 }
 
 .profile__meter-fill--low { background: var(--tc-wait); }
+
+.profile__wallet { margin-bottom: var(--tc-space-5); }
+
+.profile__wallet-amount {
+  font-size: var(--tc-text-lg);
+  color: var(--tc-brand);
+  white-space: nowrap;
+}
+
+.profile__wallet-loading {
+  width: 80px;
+  height: 22px;
+}
+
+.profile__wallet-topup {
+  display: flex;
+  gap: var(--tc-space-2);
+  align-items: flex-start;
+  margin-top: var(--tc-space-4);
+}
+
+.profile__wallet-field {
+  flex: 1;
+  margin-bottom: 0;
+}

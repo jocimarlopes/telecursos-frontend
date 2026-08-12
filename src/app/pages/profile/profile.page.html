@@ -52,6 +52,35 @@
       </div>
     </section>
 
+    <!-- Saldo de créditos -->
+    <section class="tc-card profile__wallet">
+      <div class="tc-card__body">
+        <div class="profile__sub-head">
+          <div>
+            <h2 class="tc-card__title">Meu saldo</h2>
+            <p class="tc-card__meta">
+              Use para pagar certificados ou a assinatura na hora.
+            </p>
+          </div>
+          <strong class="profile__wallet-amount" *ngIf="!loadingWallet">
+            {{ helper.formatMoney(walletBalanceCents) }}
+          </strong>
+          <ion-skeleton-text *ngIf="loadingWallet" animated
+                             class="profile__wallet-loading"></ion-skeleton-text>
+        </div>
+
+        <div class="profile__wallet-topup">
+          <ion-item lines="none" class="tc-field profile__wallet-field">
+            <ion-note slot="start">R$</ion-note>
+            <ion-input inputmode="decimal" placeholder="30,00"
+                       [(ngModel)]="topupAmount" name="topupAmount"></ion-input>
+          </ion-item>
+          <ion-button class="tc-btn" (click)="topup()">Recarregar</ion-button>
+        </div>
+        <span class="tc-field-error" *ngIf="topupError">{{ topupError }}</span>
+      </div>
+    </section>
+
     <!-- Atalhos -->
     <nav class="profile__nav">
       <button type="button" class="tc-card profile__link" (click)="go('/meus-cursos')">

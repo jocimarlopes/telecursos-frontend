@@ -18,6 +18,12 @@ export class ProfilePage implements OnInit {
   saving = false;
   error = '';
 
+  // --- saldo ---
+  walletBalanceCents = 0;
+  loadingWallet = true;
+  topupAmount = '';
+  topupError = '';
+
   constructor(
     public helper: HelperService,
     private users: UserService,
@@ -29,6 +35,31 @@ export class ProfilePage implements OnInit {
       this.user = data;
       if (data) this.resetForm();
     });
+    this.loadWallet();
+  }
+
+  /** Saldo lido do servidor, nunca do token: ele muda a qualquer compra. */
+  private loadWallet() {
+    this.loadingWallet = true;
+    this.api.get('api/wallet', this.users.getToken()).subscribe({
+      next: (res: any) => {
+        this.loadingWallet = false;
+        this.walletBalanceCents = res.balance_cents ?? 0;
+      },
+      error: () => { this.loadingWallet = false; },
+    });
+  }
+
+  /** Manda para o checkout recarregar — o valor escolhido aqui é só um
+   * rascunho: o backend confere o piso e o teto antes de qualquer cobrança. */
+  topup() {
+    this.topupError = '';
+    const cents = Math.round(parseFloat(String(this.topupAmount).replace(',', '.')) * 100);
+    if (!cents || cents < 500) {
+      this.topupError = 'Informe ao menos R$ 5,00.';
+      return;
+    }
+    this.helper.goToPage('/assinar', { queryParams: { kind: 'credit_topup', amount: cents } });
   }
 
   get initials(): string {

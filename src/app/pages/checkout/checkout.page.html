@@ -30,15 +30,18 @@
 
     <ng-container *ngIf="!accessBlocked">
       <h1 class="tc-section-title">
-        {{ isCertificate ? 'Pagar certificado'
+        {{ isTopup ? 'Recarregar saldo'
+           : isCertificate ? 'Pagar certificado'
            : isRenewal ? 'Renovar assinatura' : 'Assinatura mensal' }}
       </h1>
       <p class="tc-section-sub">
-        {{ isCertificate
-           ? 'Conclua o pagamento para liberar a emissão do seu certificado.'
-           : isRenewal
-             ? 'Os dias que ainda restam são somados ao novo mês.'
-             : 'Acesso a todos os cursos por 30 dias. Sem fidelidade.' }}
+        {{ isTopup
+           ? 'O valor entra no seu saldo assim que o pagamento for confirmado.'
+           : isCertificate
+             ? 'Conclua o pagamento para liberar a emissão do seu certificado.'
+             : isRenewal
+               ? 'Os dias que ainda restam são somados ao novo mês.'
+               : 'Acesso a todos os cursos por 30 dias. Sem fidelidade.' }}
       </p>
 
       <div class="checkout__expired" *ngIf="subscription?.expired && !isCertificate">
@@ -53,8 +56,9 @@
       <div class="tc-card checkout__summary">
         <div class="tc-card__body">
           <div class="checkout__line">
-            <span>{{ isCertificate ? 'Certificado · emissão imediata'
-                                   : 'Assinatura mensal · 30 dias' }}</span>
+            <span>{{ isTopup ? 'Recarga de saldo'
+                    : isCertificate ? 'Certificado · emissão imediata'
+                    : 'Assinatura mensal · 30 dias' }}</span>
             <strong *ngIf="!loadingQuote">{{ helper.formatMoney(amountCents) }}</strong>
             <ion-skeleton-text *ngIf="loadingQuote" animated
                                class="checkout__price-loading"></ion-skeleton-text>
@@ -63,7 +67,11 @@
             Assim que o pagamento for confirmado, o certificado fica disponível
             para baixar em Meus certificados.
           </p>
-          <p class="checkout__line-note" *ngIf="!isCertificate">
+          <p class="checkout__line-note" *ngIf="isTopup">
+            O crédito fica disponível na hora e vale para qualquer compra —
+            certificado ou assinatura.
+          </p>
+          <p class="checkout__line-note" *ngIf="!isCertificate && !isTopup">
             Cobrança avulsa: nada é debitado automaticamente. Ao vencer, você
             escolhe se renova.
           </p>
@@ -82,6 +90,9 @@
 
       <!-- Forma de pagamento -->
       <ion-segment class="checkout__tabs" [(ngModel)]="method" mode="md">
+        <ion-segment-button value="wallet" *ngIf="canPayWithWallet">
+          <ion-label>Saldo</ion-label>
+        </ion-segment-button>
         <ion-segment-button value="pix">
           <ion-label>Pix</ion-label>
         </ion-segment-button>
@@ -92,14 +103,30 @@
 
       <p class="auth__error" *ngIf="error" role="alert">{{ error }}</p>
 
+      <!-- Saldo -->
+      <div class="tc-card" *ngIf="method === 'wallet'">
+        <div class="tc-card__body">
+          <p class="checkout__hint">
+            Seu saldo atual é {{ helper.formatMoney(walletBalanceCents) }}.
+            {{ isCertificate ? 'O certificado libera na hora.' : 'Seu mês de acesso começa na hora.' }}
+          </p>
+          <ion-button expand="block" class="tc-btn"
+                      [disabled]="payingWithWallet || loadingQuote || !amountCents"
+                      (click)="payWithWallet()">
+            <ion-spinner *ngIf="payingWithWallet" name="crescent" slot="start"></ion-spinner>
+            {{ payingWithWallet ? 'Pagando…' : 'Pagar ' + helper.formatMoney(amountCents) + ' com o saldo' }}
+          </ion-button>
+        </div>
+      </div>
+
       <!-- Pix -->
       <div class="tc-card" *ngIf="method === 'pix'">
         <div class="tc-card__body">
           <ng-container *ngIf="!pix">
             <p class="checkout__hint">
               O código Pix é gerado na hora e vale por 30 minutos.
-              {{ isCertificate
-                 ? 'O certificado é liberado assim que o pagamento cair.'
+              {{ isTopup ? 'O saldo entra assim que o pagamento cair.'
+                 : isCertificate ? 'O certificado é liberado assim que o pagamento cair.'
                  : 'Seu mês de acesso começa assim que o pagamento cair.' }}
             </p>
             <ion-button expand="block" class="tc-btn"
