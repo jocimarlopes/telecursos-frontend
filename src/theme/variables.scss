@@ -1,2 +1,197 @@
-// For information on how to create your own theme, please see:
-// http://ionicframework.com/docs/theming/
+/* =============================================================================
+   Cursando.Pro — tokens de design
+   =============================================================================
+
+   Este arquivo estava vazio, e as cores viviam cravadas em atributos style=""
+   espalhados pelos templates. Tudo passa por aqui agora.
+
+   Direção: o público desta plataforma é o profissional que faz um curso de
+   eletricista industrial, segurança do trabalho ou refrigeração e precisa de um
+   certificado que o RH aceite. O que ele compra é credibilidade. Então o visual
+   veio do mundo do documento oficial — tinta escura sobre papel claro, azul de
+   carimbo para as ações, e um verde reservado exclusivamente para o estado
+   "autêntico" da validação. Verde nunca aparece como enfeite: quando ele surge,
+   significa que algo foi verificado.
+
+   A tipografia é Montserrat, a mesma fonte impressa no certificado. O aluno vê
+   na tela a mesma letra que vai receber no papel.
+   ============================================================================= */
+
+@font-face {
+  font-family: 'Montserrat';
+  src: url('/assets/fonts/Montserrat-Normal.ttf') format('truetype');
+  font-weight: 400;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Montserrat';
+  src: url('/assets/fonts/Montserrat-Bold.ttf') format('truetype');
+  font-weight: 700;
+  font-display: swap;
+}
+
+:root {
+  /* --- tinta e papel ------------------------------------------------------ */
+  /* Contraste conferido contra --tc-surface e --tc-paper pelo critério
+     WCAG AA (4.5:1 para texto normal). O valor original de --tc-ink-faint
+     (#7B8798) ficava em 3,4:1 e reprovava em legendas de 12px. */
+  --tc-ink:            #0E1726;  /* títulos e texto principal — 16.4:1 */
+  --tc-ink-soft:       #47556B;  /* texto secundário — 7.4:1 */
+  --tc-ink-faint:      #5F6B7D;  /* legendas, metadados — 5.4:1 */
+
+  --tc-paper:          #F4F6F9;  /* fundo da página */
+  --tc-surface:        #FFFFFF;  /* cards */
+  --tc-surface-sunken: #EEF1F6;  /* campos, trilhas de progresso */
+
+  --tc-line:           #DFE4EC;  /* hairlines */
+  --tc-line-strong:    #C3CBD8;
+
+  /* --- azul de carimbo: a cor das ações ----------------------------------- */
+  --tc-brand:          #144BA6;
+  --tc-brand-hover:    #103E8A;
+  --tc-brand-soft:     #E8EFFB;  /* fundo de destaque */
+  --tc-brand-contrast: #FFFFFF;
+
+  /* --- verde de autenticidade --------------------------------------------- */
+  /* Reservado ao estado verificado. Não use para botão comum. */
+  --tc-seal:           #0B7A4B;
+  --tc-seal-soft:      #E3F4EC;
+
+  /* --- âmbar: aguardando (prazo do certificado, pagamento pendente) -------- */
+  --tc-wait:           #9A5B06;
+  --tc-wait-soft:      #FDF1DF;
+
+  /* --- vermelho: erro, revogação ------------------------------------------ */
+  --tc-alert:          #B42318;
+  --tc-alert-soft:     #FDECEA;
+
+  /* --- forma --------------------------------------------------------------- */
+  --tc-radius-sm: 8px;
+  --tc-radius:    12px;
+  --tc-radius-lg: 18px;
+
+  /* Sombras discretas: o peso visual vem da hairline, não do blur. Sombra
+     forte fica reservada ao que realmente flutua sobre a página. */
+  --tc-shadow-card:  0 1px 2px rgba(14, 23, 38, 0.04);
+  --tc-shadow-lift:  0 8px 24px rgba(14, 23, 38, 0.10);
+
+  --tc-space-1: 4px;
+  --tc-space-2: 8px;
+  --tc-space-3: 12px;
+  --tc-space-4: 16px;
+  --tc-space-5: 24px;
+  --tc-space-6: 32px;
+  --tc-space-7: 48px;
+
+  --tc-content-width: 1120px;
+
+  /* --- tipografia ---------------------------------------------------------- */
+  --tc-font: 'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI',
+             Roboto, Helvetica, Arial, sans-serif;
+  /* Códigos de verificação são lidos em voz alta e digitados à mão a partir de
+     um papel. Monoespaçada com glifos distinguíveis é requisito funcional. */
+  --tc-font-mono: ui-monospace, 'SF Mono', 'Roboto Mono', Menlo, Consolas, monospace;
+
+  --tc-text-xs:  12px;
+  --tc-text-sm:  14px;
+  --tc-text-md:  16px;
+  --tc-text-lg:  19px;
+  --tc-text-xl:  24px;
+  --tc-text-2xl: 32px;
+  --tc-text-3xl: 42px;
+
+  /* =========================================================================
+     Ponte para as variáveis do Ionic
+     ========================================================================= */
+
+  --ion-font-family: var(--tc-font);
+  --ion-background-color: var(--tc-paper);
+  --ion-background-color-rgb: 244, 246, 249;
+  --ion-text-color: var(--tc-ink);
+  --ion-text-color-rgb: 14, 23, 38;
+
+  --ion-card-background: var(--tc-surface);
+  --ion-item-background: var(--tc-surface);
+  --ion-toolbar-background: var(--tc-surface);
+  --ion-tab-bar-background: var(--tc-surface);
+  --ion-border-color: var(--tc-line);
+
+  --ion-color-primary: var(--tc-brand);
+  --ion-color-primary-rgb: 20, 75, 166;
+  --ion-color-primary-contrast: #ffffff;
+  --ion-color-primary-contrast-rgb: 255, 255, 255;
+  --ion-color-primary-shade: #103E8A;
+  --ion-color-primary-tint: #2C5FB2;
+
+  --ion-color-secondary: #3D5A80;
+  --ion-color-secondary-rgb: 61, 90, 128;
+  --ion-color-secondary-contrast: #ffffff;
+  --ion-color-secondary-contrast-rgb: 255, 255, 255;
+  --ion-color-secondary-shade: #364F70;
+  --ion-color-secondary-tint: #506B8D;
+
+  --ion-color-success: var(--tc-seal);
+  --ion-color-success-rgb: 11, 122, 75;
+  --ion-color-success-contrast: #ffffff;
+  --ion-color-success-contrast-rgb: 255, 255, 255;
+  --ion-color-success-shade: #0A6B42;
+  --ion-color-success-tint: #23875D;
+
+  --ion-color-warning: var(--tc-wait);
+  --ion-color-warning-rgb: 154, 91, 6;
+  --ion-color-warning-contrast: #ffffff;
+  --ion-color-warning-contrast-rgb: 255, 255, 255;
+  --ion-color-warning-shade: #885005;
+  --ion-color-warning-tint: #A46B1F;
+
+  --ion-color-danger: var(--tc-alert);
+  --ion-color-danger-rgb: 180, 35, 24;
+  --ion-color-danger-contrast: #ffffff;
+  --ion-color-danger-contrast-rgb: 255, 255, 255;
+  --ion-color-danger-shade: #9E1F15;
+  --ion-color-danger-tint: #BC392F;
+
+  --ion-color-medium: var(--tc-ink-soft);
+  --ion-color-medium-rgb: 71, 85, 107;
+  --ion-color-medium-contrast: #ffffff;
+  --ion-color-medium-contrast-rgb: 255, 255, 255;
+  --ion-color-medium-shade: #3E4B5E;
+  --ion-color-medium-tint: #59667A;
+
+  --ion-color-light: var(--tc-surface-sunken);
+  --ion-color-light-rgb: 238, 241, 246;
+  --ion-color-light-contrast: var(--tc-ink);
+  --ion-color-light-contrast-rgb: 14, 23, 38;
+  --ion-color-light-shade: #D1D4D8;
+  --ion-color-light-tint: #F0F3F7;
+
+  --ion-color-dark: var(--tc-ink);
+  --ion-color-dark-rgb: 14, 23, 38;
+  --ion-color-dark-contrast: #ffffff;
+  --ion-color-dark-contrast-rgb: 255, 255, 255;
+  --ion-color-dark-shade: #0C1421;
+  --ion-color-dark-tint: #262E3C;
+
+  /* Escala de cinzas do Ionic, reancorada no papel claro. Sem isso os
+     componentes internos do framework continuam pintando com a escala escura. */
+  --ion-color-step-50:  #EDF0F4;
+  --ion-color-step-100: #E2E6EC;
+  --ion-color-step-150: #D6DBE4;
+  --ion-color-step-200: #CBD1DC;
+  --ion-color-step-250: #BFC7D4;
+  --ion-color-step-300: #B4BCCC;
+  --ion-color-step-350: #A8B2C4;
+  --ion-color-step-400: #9DA7BC;
+  --ion-color-step-450: #919DB4;
+  --ion-color-step-500: #8692AC;
+  --ion-color-step-550: #7A88A4;
+  --ion-color-step-600: #6F7D9C;
+  --ion-color-step-650: #637394;
+  --ion-color-step-700: #58688C;
+  --ion-color-step-750: #4C5E84;
+  --ion-color-step-800: #41537C;
+  --ion-color-step-850: #354974;
+  --ion-color-step-900: #2A3E6C;
+  --ion-color-step-950: #1E3464;
+}

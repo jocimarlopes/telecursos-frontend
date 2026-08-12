@@ -1,14 +1,3 @@
-/*
- * App Global CSS
- * ----------------------------------------------------------------------------
- * Put style rules here that you want to apply globally. These styles are for
- * the entire app and not just one component. Additionally, this file can be
- * used as an entry point to import other CSS/Sass files to be included in the
- * output CSS.
- * For more information on global stylesheets, visit the documentation:
- * https://ionicframework.com/docs/layout/global-stylesheets
- */
-
 /* Core CSS required for Ionic components to work properly */
 @import "@ionic/angular/css/core.css";
 
@@ -18,120 +7,540 @@
 @import "@ionic/angular/css/typography.css";
 @import "@ionic/angular/css/display.css";
 
-/* Optional CSS utils that can be commented out */
+/* Optional CSS utils */
 @import "@ionic/angular/css/padding.css";
 @import "@ionic/angular/css/float-elements.css";
 @import "@ionic/angular/css/text-alignment.css";
 @import "@ionic/angular/css/text-transformation.css";
 @import "@ionic/angular/css/flex-utils.css";
 
-/**
- * Ionic Dark Mode
- * -----------------------------------------------------
- * For more info, please see:
- * https://ionicframework.com/docs/theming/dark-mode
- */
+/* O tema escuro forçado (`palettes/dark.always.css`) saiu daqui. Era ele que
+   pintava a plataforma inteira de #0f0f1c independentemente dos tokens. */
 
-@import "@ionic/angular/css/palettes/dark.always.css";
-/* @import "@ionic/angular/css/palettes/dark.class.css"; */
+/* =============================================================================
+   Base
+   ============================================================================= */
 
-ion-toolbar {
-    background: rgba(0, 0, 0, 0.15);
-    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
-    backdrop-filter: blur(4px);
-    -webkit-backdrop-filter: blur(4px);
+* {
+  -webkit-tap-highlight-color: transparent;
 }
 
-ion-modal {
-    --width: 100%;
-    --height: 100%;
-    --max-width: 800px;
-    --max-height: 100%;
-  }
-ion-modal.welcome-modal {
-    --width: 100%;
-    --height: 100%;
-    --max-width: 800px;
-    --max-height: 100%;
-    --border-radius: 0px;
-}
-ion-popover {
-  --background: rgba(0, 0, 0, 0.474);
-  --backdrop-opacity: 0.6;
-  --box-shadow: 0 5px 10px 0 rgba(0, 0, 0, 0.8);
-  --color: white;
-  --width: 100%;
-  --max-width: 600px;
-  --border-radius: 8px;
-  --padding: 16px;
-  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
-  backdrop-filter: blur( 6px );
-  -webkit-backdrop-filter: blur( 6px );
+body {
+  font-family: var(--tc-font);
+  color: var(--tc-ink);
+  background: var(--tc-paper);
 }
 
-ion-popover ion-content {
-  --background: rgba(0, 0, 0, 0.474);
+h1, h2, h3, h4 {
+  color: var(--tc-ink);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
 }
 
-.home-content {
-    --background: #0f0f1b;
-    color: white;
-    padding: 16px;
-  }
-  
-  .section-title {
-    font-size: 20px;
-    font-weight: 600;
-    margin: 16px 0 8px;
-    color: #c084fc;
-  }
-  
-  .course-slider {
-    display: flex;
-    overflow-x: auto;
-    padding-bottom: 12px;
-    gap: 12px;
-  }
-  
-  .course-card {
-    flex: 0 0 auto;
-    background: #1a1a2e;
-    border-radius: 8px;
-    overflow: hidden;
-    position: relative;
-    transition: transform 0.3s ease;
-  }
-  
-  .course-card:hover {
-    transform: scale(1.05);
-  }
-  
-  .course-card img {
-    width: 100%;
-    object-fit: cover;
-  }
-  .title {
-    font-size: 1rem;
-    color: var(--ion-color-dark);
-  }
-  .logo {
-    height: 36px;
-    margin: 3px;
-  }
-  .loading {
-    width: 100%;
-    margin: 30px 0px;
+/* =============================================================================
+   Layout
+   ============================================================================= */
+
+.tc-page {
+  --background: var(--tc-paper);
+}
+
+.tc-container {
+  width: 100%;
+  max-width: var(--tc-content-width);
+  margin: 0 auto;
+  padding: var(--tc-space-5) var(--tc-space-4) var(--tc-space-7);
+}
+
+.tc-container--narrow {
+  max-width: 640px;
+}
+
+.tc-stack > * + * {
+  margin-top: var(--tc-space-4);
+}
+
+/* =============================================================================
+   Cabeçalho
+   ============================================================================= */
+
+ion-toolbar.tc-toolbar {
+  --background: var(--tc-surface);
+  --color: var(--tc-ink);
+  --border-color: var(--tc-line);
+  --min-height: 60px;
+  border-bottom: 1px solid var(--tc-line);
+}
+
+.tc-brand {
+  display: flex;
+  align-items: center;
+  gap: var(--tc-space-2);
+  cursor: pointer;
+  padding-inline-start: var(--tc-space-3);
+}
+
+.tc-brand__logo {
+  height: 30px;
+  width: auto;
+}
+
+.tc-brand__name {
+  font-weight: 700;
+  font-size: var(--tc-text-md);
+  letter-spacing: -0.02em;
+  color: var(--tc-ink);
+}
+
+/* =============================================================================
+   Títulos de seção
+   ============================================================================= */
+
+.tc-section-title {
+  font-size: var(--tc-text-xl);
+  font-weight: 700;
+  margin: 0 0 var(--tc-space-1);
+}
+
+.tc-section-sub {
+  color: var(--tc-ink-soft);
+  font-size: var(--tc-text-sm);
+  margin: 0 0 var(--tc-space-5);
+}
+
+.tc-eyebrow {
+  display: block;
+  font-size: var(--tc-text-xs);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--tc-ink-faint);
+  margin-bottom: var(--tc-space-2);
+}
+
+/* =============================================================================
+   Cartões
+   ============================================================================= */
+
+.tc-card {
+  background: var(--tc-surface);
+  border: 1px solid var(--tc-line);
+  border-radius: var(--tc-radius);
+  box-shadow: var(--tc-shadow-card);
+  overflow: hidden;
+}
+
+.tc-card__body {
+  padding: var(--tc-space-4);
+}
+
+.tc-card__title {
+  font-size: var(--tc-text-md);
+  font-weight: 700;
+  margin: 0 0 var(--tc-space-1);
+}
+
+.tc-card__meta {
+  font-size: var(--tc-text-sm);
+  color: var(--tc-ink-faint);
+  margin: 0;
+}
+
+/* --- cartão de curso ------------------------------------------------------ */
+
+.tc-course-card {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: var(--tc-surface);
+  border: 1px solid var(--tc-line);
+  border-radius: var(--tc-radius);
+  box-shadow: var(--tc-shadow-card);
+  overflow: hidden;
+  cursor: pointer;
+  text-align: start;
+  transition: transform 160ms ease, box-shadow 160ms ease, border-color 160ms ease;
+}
+
+.tc-course-card:hover,
+.tc-course-card:focus-visible {
+  transform: translateY(-2px);
+  box-shadow: var(--tc-shadow-lift);
+  border-color: var(--tc-line-strong);
+}
+
+.tc-course-card__cover {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  background: var(--tc-surface-sunken);
+  display: block;
+}
+
+/* A capa dentro do card encosta nas bordas do próprio card (que já tem
+   overflow hidden), então não leva cantos arredondados nem borda própria. */
+.tc-course-card__cover .cover {
+  border-radius: 0;
+  border: none;
+  height: 100%;
+}
+
+.tc-course-card__body {
+  padding: var(--tc-space-3) var(--tc-space-4) var(--tc-space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--tc-space-2);
+  flex: 1;
+}
+
+.tc-course-card__title {
+  font-size: var(--tc-text-sm);
+  font-weight: 700;
+  line-height: 1.35;
+  margin: 0;
+  color: var(--tc-ink);
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* =============================================================================
+   Selo de verificação — o elemento assinatura
+   =============================================================================
+   Um certificado só vale se der para conferir. O selo é a resposta visual dessa
+   conferência: aparece na página de validação e, em miniatura, ao lado de cada
+   certificado já emitido. É o único lugar onde o verde de autenticidade vive. */
+
+.tc-seal {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--tc-space-2);
+  padding: var(--tc-space-2) var(--tc-space-4);
+  border-radius: 999px;
+  font-size: var(--tc-text-sm);
+  font-weight: 700;
+  border: 1.5px solid currentColor;
+}
+
+.tc-seal--valid   { color: var(--tc-seal);  background: var(--tc-seal-soft); }
+.tc-seal--waiting { color: var(--tc-wait);  background: var(--tc-wait-soft); }
+.tc-seal--invalid { color: var(--tc-alert); background: var(--tc-alert-soft); }
+
+/* O carimbo grande da página de validação. A leve rotação e a borda dupla
+   citam um carimbo de cartório — é a peça que diz "documento conferido". */
+.tc-stamp {
+  --stamp-color: var(--tc-seal);
+  display: grid;
+  place-items: center;
+  gap: 2px;
+  width: 148px;
+  height: 148px;
+  margin: 0 auto;
+  border: 3px solid var(--stamp-color);
+  outline: 1px solid var(--stamp-color);
+  outline-offset: 5px;
+  border-radius: 50%;
+  color: var(--stamp-color);
+  transform: rotate(-6deg);
+  text-align: center;
+  padding: var(--tc-space-3);
+}
+
+.tc-stamp--invalid { --stamp-color: var(--tc-alert); }
+.tc-stamp--waiting { --stamp-color: var(--tc-wait); }
+
+.tc-stamp__icon  { font-size: 34px; }
+.tc-stamp__label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  line-height: 1.25;
+}
+
+/* Código de verificação: monoespaçado e espaçado, porque é lido de um papel
+   impresso e digitado caractere a caractere. */
+.tc-code {
+  font-family: var(--tc-font-mono);
+  font-size: var(--tc-text-md);
+  letter-spacing: 0.12em;
+  font-weight: 700;
+  color: var(--tc-ink);
+  background: var(--tc-surface-sunken);
+  border: 1px solid var(--tc-line);
+  border-radius: var(--tc-radius-sm);
+  padding: var(--tc-space-2) var(--tc-space-3);
+  display: inline-block;
+  word-break: break-all;
+}
+
+/* =============================================================================
+   Etiquetas de estado
+   ============================================================================= */
+
+.tc-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px var(--tc-space-2);
+  border-radius: 999px;
+  font-size: var(--tc-text-xs);
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.tc-tag--issued  { color: var(--tc-seal);  background: var(--tc-seal-soft); }
+.tc-tag--waiting { color: var(--tc-wait);  background: var(--tc-wait-soft); }
+.tc-tag--ready   { color: var(--tc-brand); background: var(--tc-brand-soft); }
+.tc-tag--failed  { color: var(--tc-alert); background: var(--tc-alert-soft); }
+.tc-tag--muted   { color: var(--tc-ink-faint); background: var(--tc-surface-sunken); }
+
+/* =============================================================================
+   Definições (rótulo + valor)
+   ============================================================================= */
+
+.tc-defs {
+  display: grid;
+  gap: var(--tc-space-4);
+  margin: 0;
+}
+
+@media (min-width: 560px) {
+  .tc-defs--2col { grid-template-columns: 1fr 1fr; }
+}
+
+.tc-def__label {
+  font-size: var(--tc-text-xs);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--tc-ink-faint);
+  margin: 0 0 2px;
+}
+
+.tc-def__value {
+  font-size: var(--tc-text-md);
+  color: var(--tc-ink);
+  margin: 0;
+  font-weight: 700;
+}
+
+/* =============================================================================
+   Formulários
+   ============================================================================= */
+
+.tc-field {
+  --background: var(--tc-surface);
+  --border-radius: var(--tc-radius-sm);
+  --padding-start: var(--tc-space-3);
+  --padding-end: var(--tc-space-3);
+  --highlight-color-focused: var(--tc-brand);
+  --min-height: 52px;
+  /* Sem isto o Ionic pinta o valor digitado num cinza claro, e o campo
+     preenchido fica indistinguível de um campo com placeholder. */
+  --color: var(--tc-ink);
+  --placeholder-color: var(--tc-ink-faint);
+  --placeholder-opacity: 1;
+  border: 1px solid var(--tc-line-strong);
+  border-radius: var(--tc-radius-sm);
+  margin-bottom: var(--tc-space-3);
+}
+
+.tc-field.item-has-focus {
+  border-color: var(--tc-brand);
+  box-shadow: 0 0 0 3px var(--tc-brand-soft);
+}
+
+.tc-field ion-input,
+.tc-field ion-select,
+.tc-field ion-textarea {
+  --color: var(--tc-ink);
+  color: var(--tc-ink);
+}
+
+.tc-field--invalid {
+  border-color: var(--tc-alert);
+}
+
+.tc-field-error {
+  color: var(--tc-alert);
+  font-size: var(--tc-text-xs);
+  margin: calc(var(--tc-space-3) * -1) 0 var(--tc-space-3);
+  display: block;
+}
+
+.tc-label {
+  display: block;
+  font-size: var(--tc-text-sm);
+  font-weight: 700;
+  color: var(--tc-ink);
+  margin-bottom: var(--tc-space-2);
+}
+
+/* =============================================================================
+   Botões
+   ============================================================================= */
+
+ion-button.tc-btn {
+  --border-radius: var(--tc-radius-sm);
+  --box-shadow: none;
+  --padding-top: 20px;
+  --padding-bottom: 20px;
+  font-weight: 700;
+  font-size: var(--tc-text-md);
+  letter-spacing: 0;
+  text-transform: none;
+  margin: 0;
+}
+
+ion-button.tc-btn--block {
+  display: block;
+  width: 100%;
+}
+
+/* =============================================================================
+   Telas de acesso (entrar, cadastrar, recuperar)
+   ============================================================================= */
+
+.auth {
+  min-height: 100%;
+  display: grid;
+  place-items: center;
+  padding: var(--tc-space-5) var(--tc-space-4);
+}
+
+.auth__panel {
+  width: 100%;
+  max-width: 420px;
+  background: var(--tc-surface);
+  border: 1px solid var(--tc-line);
+  border-radius: var(--tc-radius-lg);
+  box-shadow: var(--tc-shadow-card);
+  padding: var(--tc-space-6) var(--tc-space-5) var(--tc-space-5);
+}
+
+.auth__logo {
+  height: 40px;
+  width: auto;
+  margin-bottom: var(--tc-space-5);
+}
+
+.auth__title {
+  font-size: var(--tc-text-xl);
+  margin: 0 0 var(--tc-space-2);
+}
+
+.auth__lead {
+  color: var(--tc-ink-soft);
+  font-size: var(--tc-text-sm);
+  margin: 0 0 var(--tc-space-5);
+}
+
+.auth__error {
+  color: var(--tc-alert);
+  background: var(--tc-alert-soft);
+  border-radius: var(--tc-radius-sm);
+  padding: var(--tc-space-3);
+  font-size: var(--tc-text-sm);
+  margin: 0 0 var(--tc-space-4);
+}
+
+.auth__switch {
+  text-align: center;
+  font-size: var(--tc-text-sm);
+  color: var(--tc-ink-soft);
+  margin: var(--tc-space-5) 0 0;
+}
+
+.auth__switch a {
+  color: var(--tc-brand);
+  font-weight: 700;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.auth__switch a:hover { text-decoration: underline; }
+
+/* =============================================================================
+   Estados vazios e carregamento
+   ============================================================================= */
+
+.tc-empty {
+  text-align: center;
+  padding: var(--tc-space-7) var(--tc-space-4);
+  color: var(--tc-ink-soft);
+}
+
+.tc-empty__icon {
+  font-size: 44px;
+  color: var(--tc-line-strong);
+  margin-bottom: var(--tc-space-3);
+}
+
+.tc-empty__title {
+  font-size: var(--tc-text-lg);
+  font-weight: 700;
+  color: var(--tc-ink);
+  margin: 0 0 var(--tc-space-2);
+}
+
+.tc-empty__text {
+  margin: 0 auto var(--tc-space-5);
+  max-width: 420px;
+  font-size: var(--tc-text-sm);
+}
+
+.tc-skeleton {
+  background: var(--tc-surface-sunken);
+  border-radius: var(--tc-radius);
+  overflow: hidden;
+}
+
+/* =============================================================================
+   Acessibilidade
+   ============================================================================= */
+
+:focus-visible {
+  outline: 2px solid var(--tc-brand);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Texto só para leitores de tela. */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
   }
 
-.back-button {
-    position: absolute;
-    top: 0px;
-    left: 10px;
-    z-index: 9999;
+  .tc-course-card:hover { transform: none; }
 }
-.glass {
-  --background: transparent;
-  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
-  border-radius: 10px;
-  border: 1px solid rgba(0, 0, 0, 0.18);
+
+/* =============================================================================
+   Overlays remanescentes
+   ============================================================================= */
+
+ion-loading, ion-alert {
+  --background: var(--tc-surface);
+  --color: var(--tc-ink);
+}
+
+ion-toast {
+  --border-radius: var(--tc-radius-sm);
 }
