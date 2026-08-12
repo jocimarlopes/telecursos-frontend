@@ -1,0 +1,33 @@
+.certs {
+  display: grid;
+  gap: var(--tc-space-4);
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 330px), 1fr));
+}
+
+.certs__skeleton { height: 220px; }
+
+.cert__seal { margin-bottom: var(--tc-space-4); }
+
+.cert__title {
+  font-size: var(--tc-text-md);
+  margin: 0 0 var(--tc-space-1);
+}
+
+.cert__meta {
+  font-size: var(--tc-text-sm);
+  color: var(--tc-ink-faint);
+  margin: 0 0 var(--tc-space-4);
+}
+
+.cert__code {
+  display: flex;
+  align-items: center;
+  gap: var(--tc-space-2);
+  margin-bottom: var(--tc-space-4);
+}
+
+.cert__actions {
+  display: flex;
+  gap: var(--tc-space-2);
+  flex-wrap: wrap;
+}

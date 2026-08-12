@@ -1,0 +1,94 @@
+.issue__skeleton { height: 220px; }
+
+.issue__group { margin-bottom: var(--tc-space-5); }
+
+.issue__option {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--tc-space-3);
+  padding: var(--tc-space-4);
+  background: var(--tc-surface);
+  border: 1px solid var(--tc-line);
+  border-radius: var(--tc-radius);
+  cursor: pointer;
+  transition: border-color 140ms ease, box-shadow 140ms ease;
+}
+
+.issue__option + .issue__option { margin-top: var(--tc-space-2); }
+
+.issue__option:hover { border-color: var(--tc-line-strong); }
+
+.issue__option--selected {
+  border-color: var(--tc-brand);
+  box-shadow: 0 0 0 3px var(--tc-brand-soft);
+}
+
+/* O input real fica acessível ao teclado e leitores de tela; o círculo
+   desenhado é só a representação visual. */
+.issue__radio {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.issue__mark {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 2px solid var(--tc-line-strong);
+  display: block;
+  position: relative;
+}
+
+.issue__option--selected .issue__mark {
+  border-color: var(--tc-brand);
+}
+
+.issue__option--selected .issue__mark::after {
+  content: '';
+  position: absolute;
+  inset: 3px;
+  border-radius: 50%;
+  background: var(--tc-brand);
+}
+
+.issue__radio:focus-visible + .issue__mark {
+  outline: 2px solid var(--tc-brand);
+  outline-offset: 2px;
+}
+
+.issue__info { display: block; min-width: 0; }
+
+.issue__name {
+  display: block;
+  font-weight: 700;
+  font-size: var(--tc-text-sm);
+  color: var(--tc-ink);
+}
+
+.issue__meta {
+  display: block;
+  font-size: var(--tc-text-xs);
+  color: var(--tc-ink-faint);
+  margin-top: 2px;
+}
+
+.issue__price {
+  font-weight: 700;
+  font-size: var(--tc-text-sm);
+  color: var(--tc-ink);
+  white-space: nowrap;
+}
+
+.issue__price--free { color: var(--tc-seal); }
+
+.issue__submit { margin-top: var(--tc-space-5); }
+
+.issue__note {
+  text-align: center;
+  font-size: var(--tc-text-xs);
+  color: var(--tc-ink-faint);
+  margin-top: var(--tc-space-3);
+}

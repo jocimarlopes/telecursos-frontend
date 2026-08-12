@@ -1,13 +1,81 @@
-<ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title>my-courses</ion-title>
-  </ion-toolbar>
-</ion-header>
+<app-header [back]="true" title="Meus cursos"></app-header>
 
-<ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">my-courses</ion-title>
-    </ion-toolbar>
-  </ion-header>
+<ion-content class="tc-page">
+  <ion-refresher slot="fixed" (ionRefresh)="load($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+
+  <div class="tc-container">
+    <h1 class="tc-section-title">Meus cursos</h1>
+    <p class="tc-section-sub">
+      Cursos que você já iniciou e a situação de cada certificado.
+    </p>
+
+    <div class="my-courses__list" *ngIf="loading">
+      <div class="tc-skeleton my-courses__skeleton" *ngFor="let i of [1,2,3]"></div>
+    </div>
+
+    <div class="tc-empty" *ngIf="!loading && failed">
+      <ion-icon class="tc-empty__icon" name="cloud-offline-outline"></ion-icon>
+      <h2 class="tc-empty__title">Não foi possível carregar</h2>
+      <p class="tc-empty__text">Verifique sua conexão e tente novamente.</p>
+      <ion-button class="tc-btn" (click)="load()">Tentar novamente</ion-button>
+    </div>
+
+    <div class="tc-empty" *ngIf="!loading && !failed && !courses.length">
+      <ion-icon class="tc-empty__icon" name="library-outline"></ion-icon>
+      <h2 class="tc-empty__title">Você ainda não começou nenhum curso</h2>
+      <p class="tc-empty__text">
+        Assim que iniciar um curso, ele aparece aqui com o prazo do certificado.
+      </p>
+      <ion-button class="tc-btn" routerLink="/home">Ver cursos disponíveis</ion-button>
+    </div>
+
+    <ul class="my-courses__list" *ngIf="!loading && courses.length">
+      <li class="tc-card my-course" *ngFor="let course of courses; trackBy: trackByUid">
+
+        <cover-image class="my-course__cover"
+                     [src]="course.image"
+                     [title]="course.name"></cover-image>
+
+        <div class="my-course__body">
+          <h2 class="my-course__title">{{ course.name }}</h2>
+
+          <p class="my-course__meta">
+            <ng-container *ngIf="course.downloaded_at">
+              Iniciado em {{ helper.formatDate(course.downloaded_at) }}
+            </ng-container>
+            <ng-container *ngIf="!course.downloaded_at">
+              Data de início não registrada
+            </ng-container>
+            <ng-container *ngIf="course.institution_name">
+              · {{ course.institution_name }} · {{ course.workload_hours }}h
+            </ng-container>
+          </p>
+
+          <certificate-status [course]="course"></certificate-status>
+        </div>
+
+        <div class="my-course__actions">
+          <ion-button *ngIf="course.certificate_status === 'active'"
+                      class="tc-btn" fill="outline" size="small"
+                      (click)="download(course)">
+            <ion-icon slot="start" name="download-outline"></ion-icon>
+            Baixar certificado
+          </ion-button>
+
+          <ion-button *ngIf="course.certificate_status === 'pending_payment'"
+                      class="tc-btn" size="small" (click)="payPending(course)">
+            Concluir pagamento
+          </ion-button>
+
+          <ion-button *ngIf="!course.certificate_uid"
+                      class="tc-btn" size="small" (click)="issue(course)">
+            <ion-icon slot="start" name="ribbon-outline"></ion-icon>
+            Emitir certificado
+          </ion-button>
+        </div>
+      </li>
+    </ul>
+  </div>
 </ion-content>

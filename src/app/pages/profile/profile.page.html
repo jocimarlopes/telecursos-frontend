@@ -1,69 +1,172 @@
-<ion-header [translucent]="true">
-  <ion-toolbar color="transparent">
-    <img (click)="goBack()" class="logo" src="assets/logo.png">
-    <ion-title (click)="goBack()">Tele Cursos</ion-title>
-    <ion-buttons slot="end">
-      <ion-button disabled fill="clear" color="dark" size="small">
-        <ion-icon name="person"></ion-icon>
-      </ion-button>
-      <ion-button  disabled size="small" fill="clear" color="dark">
-        <ion-icon name="search"></ion-icon>
-      </ion-button>
-    </ion-buttons>
-  </ion-toolbar>
-</ion-header>
+<app-header [back]="true" title="Minha conta"></app-header>
 
-<ion-content class="home-content ion-text-center" [fullscreen]="false" style="--background: #0f0f1c; color: white;">
-  <ion-button fill="clear" color="dark" class="back-button" (click)="goBack()">
-    <ion-icon name="arrow-back" slot="icon-only"></ion-icon>
-  </ion-button>
-  <div>
-    <ion-avatar style="margin: 0 auto; width: 100px; height: 100px;">
-      <img src="assets/logo.png" alt="Avatar do Usuário">
-    </ion-avatar>
+<ion-content class="tc-page">
+  <div class="tc-container tc-container--narrow">
 
-    <h2 style="margin-top: 1rem;">{{ user?.name || 'Nome do Usuário' }}</h2>
-    <p style="color: #aaa;">{{ user?.email || 'email@exemplo.com' }}</p>
+    <header class="profile__head">
+      <div class="profile__avatar" aria-hidden="true">{{ initials }}</div>
+      <div>
+        <h1 class="profile__name">{{ user?.name }} {{ user?.lastname }}</h1>
+        <p class="profile__email">{{ user?.email }}</p>
+        <span class="tc-tag"
+              [ngClass]="isPremium ? 'tc-tag--issued'
+                       : (subscription?.expired ? 'tc-tag--failed' : 'tc-tag--muted')">
+          {{ isLifetime ? 'Acesso permanente'
+             : isPremium ? ('Assinatura até ' + helper.formatDate(user?.premium_until))
+             : subscription?.expired ? 'Assinatura vencida' : 'Conta gratuita' }}
+        </span>
+      </div>
+    </header>
 
-    <ion-card (click)="goToMyCourses()" style="margin-top: 2rem; background-color: #1c1c2e;">
-      <ion-card-header>
-        <ion-card-title style="color: white;">Meus Cursos</ion-card-title>
-      </ion-card-header>
-      <ion-card-content style="color: #ccc;">
-        <p><strong>Aperte aqui para ir aos seus cursos acessados</strong></p>
-      </ion-card-content>
-    </ion-card>
+    <!-- Situação da assinatura -->
+    <section class="tc-card profile__subscription" *ngIf="!isLifetime">
+      <div class="tc-card__body">
+        <div class="profile__sub-head">
+          <div>
+            <h2 class="tc-card__title">
+              {{ isPremium ? 'Assinatura mensal' : 'Sem assinatura ativa' }}
+            </h2>
+            <p class="tc-card__meta" *ngIf="isPremium">
+              Válida até {{ helper.formatDate(user?.premium_until) }} —
+              faltam {{ daysLeft }} dia(s)
+            </p>
+            <p class="tc-card__meta" *ngIf="!isPremium">
+              {{ subscription?.expired
+                 ? ('Venceu em ' + helper.formatDate(user?.premium_until))
+                 : 'Assine para acessar os cursos e emitir certificados' }}
+            </p>
+          </div>
+          <ion-button class="tc-btn" size="small"
+                      *ngIf="!isPremium || subscription?.can_renew"
+                      (click)="go('/assinar')">
+            {{ subscription?.expired || !isPremium ? 'Assinar' : 'Renovar' }}
+          </ion-button>
+        </div>
 
-    <ion-card style="margin-top: 2rem; background-color: #1c1c2e;">
-      <ion-card-header>
-        <ion-card-title style="color: white;">Informações do Perfil</ion-card-title>
-      </ion-card-header>
-      <ion-card-content style="color: #ccc;">
-        <p><strong>Tipo de Conta:</strong> {{ user?.premium ? 'Premium' : 'Gratuita' }}</p>
-        <p><strong>Inscrito desde:</strong> {{ formatDate(user?.created_at) || '01/01/2024' }}</p>
-        <!-- <p><strong>Total de Cursos:</strong> {{ user?.coursesCount || 0 }}</p> -->
-      </ion-card-content>
-    </ion-card>
-    <ion-card style="margin-top: 2rem; background-color: #1c1c2e;">
-      <ion-card-header>
-        <ion-card-title style="color: white;">Sair</ion-card-title>
-      </ion-card-header>
-      <ion-card-content style="color: #ccc;">
-        <ion-button color="danger" fill="outline" class="botao" expand="block" (click)="logout()">Fazer logout</ion-button>
-      </ion-card-content>
-    </ion-card>
-    <!-- <ion-card style="margin-top: 1.5rem; background-color: #1c1c2e;" *ngIf="user?.accessedCourses?.length">
-      <ion-card-header>
-        <ion-card-title style="color: white;">Cursos Acessados</ion-card-title>
-      </ion-card-header>
-      <ion-card-content style="color: #ccc;">
-        <ion-item lines="none" style="--background: transparent;" *ngFor="let course of user.accessedCourses">
-          <ion-label>
-            <h3 style="color: white;">{{ course.title }}</h3>
-            <p style="color: #aaa;">Acessado em {{ course.accessedAt }}</p>
-          </ion-label>
-        </ion-item>
-      </ion-card-content>
-    </ion-card> -->
+        <!-- Barra do tempo restante do mês -->
+        <div class="profile__meter" *ngIf="isPremium && daysLeft !== null">
+          <div class="profile__meter-fill"
+               [style.width.%]="(daysLeft / 30) * 100"
+               [class.profile__meter-fill--low]="daysLeft <= 5"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Atalhos -->
+    <nav class="profile__nav">
+      <button type="button" class="tc-card profile__link" (click)="go('/meus-cursos')">
+        <ion-icon name="library-outline"></ion-icon>
+        <span>
+          <strong>Meus cursos</strong>
+          <small>Cursos iniciados e prazo dos certificados</small>
+        </span>
+        <ion-icon class="profile__chevron" name="chevron-forward-outline"></ion-icon>
+      </button>
+
+      <button type="button" class="tc-card profile__link" (click)="go('/certificados')">
+        <ion-icon name="ribbon-outline"></ion-icon>
+        <span>
+          <strong>Meus certificados</strong>
+          <small>Baixar e compartilhar o link de verificação</small>
+        </span>
+        <ion-icon class="profile__chevron" name="chevron-forward-outline"></ion-icon>
+      </button>
+
+      <button type="button" class="tc-card profile__link" (click)="go('/pagamentos')">
+        <ion-icon name="receipt-outline"></ion-icon>
+        <span>
+          <strong>Meus pagamentos</strong>
+          <small>Histórico de compras e recibos</small>
+        </span>
+        <ion-icon class="profile__chevron" name="chevron-forward-outline"></ion-icon>
+      </button>
+
+      <button type="button" class="tc-card profile__link" *ngIf="isAdmin"
+              (click)="go('/admin')">
+        <ion-icon name="settings-outline"></ion-icon>
+        <span>
+          <strong>Painel administrativo</strong>
+          <small>Instituições, modelos de certificado e pagamentos</small>
+        </span>
+        <ion-icon class="profile__chevron" name="chevron-forward-outline"></ion-icon>
+      </button>
+    </nav>
+
+    <!-- Dados -->
+    <section class="tc-card profile__section">
+      <div class="tc-card__body">
+        <div class="profile__section-head">
+          <h2 class="tc-card__title">Dados pessoais</h2>
+          <ion-button *ngIf="!editing" fill="clear" size="small" (click)="startEdit()">
+            Editar
+          </ion-button>
+        </div>
+
+        <dl class="tc-defs tc-defs--2col" *ngIf="!editing">
+          <div>
+            <p class="tc-def__label">Nome completo</p>
+            <p class="tc-def__value">{{ user?.name }} {{ user?.lastname }}</p>
+          </div>
+          <div>
+            <p class="tc-def__label">E-mail</p>
+            <p class="tc-def__value">{{ user?.email }}</p>
+          </div>
+          <div>
+            <p class="tc-def__label">CPF</p>
+            <p class="tc-def__value">
+              {{ user?.cpf ? helper.formatCpf(user!.cpf!) : 'Não informado' }}
+            </p>
+          </div>
+          <div>
+            <p class="tc-def__label">Telefone</p>
+            <p class="tc-def__value">{{ user?.phone || 'Não informado' }}</p>
+          </div>
+          <div>
+            <p class="tc-def__label">Membro desde</p>
+            <p class="tc-def__value">{{ helper.formatDate(user?.created_at) }}</p>
+          </div>
+        </dl>
+
+        <form *ngIf="editing" (ngSubmit)="save()">
+          <label class="tc-label" for="pnome">Nome</label>
+          <ion-item lines="none" class="tc-field">
+            <ion-input id="pnome" [(ngModel)]="form.name" name="name"></ion-input>
+          </ion-item>
+
+          <label class="tc-label" for="psobrenome">Sobrenome</label>
+          <ion-item lines="none" class="tc-field">
+            <ion-input id="psobrenome" [(ngModel)]="form.lastname" name="lastname"></ion-input>
+          </ion-item>
+
+          <label class="tc-label" for="pcpf">CPF</label>
+          <ion-item lines="none" class="tc-field">
+            <ion-input id="pcpf" inputmode="numeric" placeholder="000.000.000-00"
+                       [value]="form.cpf" (ionInput)="onCpfInput($event)"
+                       maxlength="14"></ion-input>
+          </ion-item>
+
+          <label class="tc-label" for="pfone">Telefone</label>
+          <ion-item lines="none" class="tc-field">
+            <ion-input id="pfone" inputmode="tel" placeholder="(00) 00000-0000"
+                       [(ngModel)]="form.phone" name="phone"></ion-input>
+          </ion-item>
+
+          <p class="auth__error" *ngIf="error" role="alert">{{ error }}</p>
+
+          <div class="profile__form-actions">
+            <ion-button type="submit" class="tc-btn" [disabled]="saving">
+              <ion-spinner *ngIf="saving" name="crescent" slot="start"></ion-spinner>
+              Salvar
+            </ion-button>
+            <ion-button type="button" fill="clear" (click)="cancelEdit()">Cancelar</ion-button>
+          </div>
+        </form>
+      </div>
+    </section>
+
+    <ion-button expand="block" fill="outline" color="danger" class="tc-btn profile__logout"
+                (click)="logout()">
+      Sair da conta
+    </ion-button>
   </div>
 </ion-content>

@@ -1,0 +1,70 @@
+<app-header [back]="true" backTo="/perfil" title="Meus certificados"></app-header>
+
+<ion-content class="tc-page">
+  <ion-refresher slot="fixed" (ionRefresh)="load($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+
+  <div class="tc-container">
+    <h1 class="tc-section-title">Meus certificados</h1>
+    <p class="tc-section-sub">
+      Cada certificado tem um código único que qualquer pessoa pode conferir.
+    </p>
+
+    <div class="certs" *ngIf="loading">
+      <div class="tc-skeleton certs__skeleton" *ngFor="let i of [1,2]"></div>
+    </div>
+
+    <div class="tc-empty" *ngIf="!loading && failed">
+      <ion-icon class="tc-empty__icon" name="cloud-offline-outline"></ion-icon>
+      <h2 class="tc-empty__title">Não foi possível carregar</h2>
+      <ion-button class="tc-btn" (click)="load()">Tentar novamente</ion-button>
+    </div>
+
+    <div class="tc-empty" *ngIf="!loading && !failed && !certificates.length">
+      <ion-icon class="tc-empty__icon" name="ribbon-outline"></ion-icon>
+      <h2 class="tc-empty__title">Você ainda não emitiu certificados</h2>
+      <p class="tc-empty__text">
+        Conclua um curso e, após 7 dias do início, o certificado fica disponível.
+      </p>
+      <ion-button class="tc-btn" routerLink="/meus-cursos">Ver meus cursos</ion-button>
+    </div>
+
+    <div class="certs" *ngIf="!loading && certificates.length">
+      <article class="tc-card cert" *ngFor="let cert of certificates; trackBy: trackByUid">
+        <div class="tc-card__body">
+          <span class="tc-seal tc-seal--valid cert__seal">
+            <ion-icon name="shield-checkmark"></ion-icon>
+            Válido
+          </span>
+
+          <h2 class="cert__title">{{ cert.course_title }}</h2>
+          <p class="cert__meta">
+            {{ cert.institution_name }} · {{ cert.workload_hours }} horas ·
+            emitido em {{ helper.formatDate(cert.issued_at) }}
+          </p>
+
+          <div class="cert__code">
+            <span class="tc-code">{{ cert.verification_code }}</span>
+            <ion-button fill="clear" size="small" (click)="copyCode(cert)"
+                        aria-label="Copiar código">
+              <ion-icon slot="icon-only" name="copy-outline"></ion-icon>
+            </ion-button>
+          </div>
+
+          <div class="cert__actions">
+            <ion-button class="tc-btn" size="small" (click)="download(cert)">
+              <ion-icon slot="start" name="download-outline"></ion-icon>
+              Baixar PDF
+            </ion-button>
+            <ion-button class="tc-btn" size="small" fill="outline"
+                        (click)="copyVerifyLink(cert)">
+              <ion-icon slot="start" name="link-outline"></ion-icon>
+              Copiar link de verificação
+            </ion-button>
+          </div>
+        </div>
+      </article>
+    </div>
+  </div>
+</ion-content>

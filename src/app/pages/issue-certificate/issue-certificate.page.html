@@ -1,0 +1,68 @@
+<app-header [back]="true" backTo="/meus-cursos" title="Emitir certificado"></app-header>
+
+<ion-content class="tc-page">
+  <div class="tc-container tc-container--narrow">
+    <h1 class="tc-section-title">Escolha o certificado</h1>
+    <p class="tc-section-sub">
+      Cada instituição emite com sua própria arte e carga horária. O certificado
+      sai na hora, com código único e QR Code de verificação — e é cobrado à
+      parte da assinatura mensal.
+    </p>
+
+    <div class="tc-skeleton issue__skeleton" *ngIf="loading"></div>
+
+    <p class="auth__error" *ngIf="error" role="alert">{{ error }}</p>
+
+    <div class="tc-empty" *ngIf="!loading && !templates.length">
+      <ion-icon class="tc-empty__icon" name="ribbon-outline"></ion-icon>
+      <h2 class="tc-empty__title">Nenhum modelo disponível</h2>
+      <p class="tc-empty__text">
+        Não há modelos de certificado ativos no momento.
+      </p>
+    </div>
+
+    <div class="issue__group" *ngFor="let group of grouped">
+      <span class="tc-eyebrow">{{ group.institution }}</span>
+
+      <label class="issue__option"
+             *ngFor="let template of group.templates"
+             [class.issue__option--selected]="selected?.uid === template.uid">
+        <input type="radio" name="template" class="issue__radio"
+               [checked]="selected?.uid === template.uid"
+               (change)="select(template)">
+        <span class="issue__mark" aria-hidden="true"></span>
+
+        <span class="issue__info">
+          <span class="issue__name">{{ template.name }}</span>
+          <span class="issue__meta">
+            {{ template.workload_hours }} horas
+            <ng-container *ngIf="template.description"> · {{ template.description }}</ng-container>
+          </span>
+        </span>
+
+        <span class="issue__price"
+              [class.issue__price--free]="!template.price_cents">
+          {{ template.price_cents ? helper.formatMoney(template.price_cents) : 'Incluso' }}
+        </span>
+      </label>
+    </div>
+
+    <ion-button expand="block" class="tc-btn issue__submit"
+                *ngIf="!loading && templates.length"
+                [disabled]="!selected || submitting"
+                (click)="submit()">
+      <ion-spinner *ngIf="submitting" name="crescent" slot="start"></ion-spinner>
+      {{ submitting ? 'Emitindo…'
+         : selected?.price_cents ? 'Continuar para o pagamento'
+         : 'Emitir certificado' }}
+    </ion-button>
+
+    <p class="issue__note" *ngIf="selected?.price_cents">
+      Os cursos estão inclusos na assinatura. O certificado é cobrado à parte,
+      uma vez por emissão.
+    </p>
+    <p class="issue__note" *ngIf="selected && !selected.price_cents">
+      Este modelo está incluso na sua assinatura.
+    </p>
+  </div>
+</ion-content>
