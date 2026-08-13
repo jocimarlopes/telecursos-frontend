@@ -33,12 +33,12 @@
 }
 
 .landing__title {
-  font-size: clamp(28px, 6vw, var(--tc-text-3xl));
+  font-size: clamp(26px, 5.4vw, var(--tc-text-3xl));
   margin: 0 0 var(--tc-space-4);
   /* Larga o bastante para as duas frases da promessa caberem em uma linha
      cada — o <br> do markup é quem decide a quebra, não a falta de espaço. */
-  max-width: 26ch;
-  line-height: 1.15;
+  max-width: 30ch;
+  line-height: 1.18;
 }
 
 .landing__points {

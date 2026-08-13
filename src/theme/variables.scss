@@ -35,14 +35,18 @@
   /* --- tinta e papel ------------------------------------------------------ */
   /* Contraste conferido contra os três fundos que esses tons realmente
      encontram — --tc-surface, --tc-paper e --tc-surface-sunken — e o número
-     anotado é sempre o PIOR dos três, não o mais favorável. A revisão
-     anterior tinha `--tc-ink-faint` anotado como 5,4:1, mas essa conta foi
-     feita só contra o branco puro: contra --tc-surface-sunken ela caía para
-     4,77:1, abaixo do mínimo de AA, e por isso a descrição dos cursos e
-     outras legendas ficavam claras demais para ler. */
+     anotado é sempre o PIOR dos três, não o mais favorável.
+
+     Segunda rodada: mesmo com --tc-ink-soft já em 9,1:1 (acima do mínimo de
+     AA), o feedback direto foi que o corpo de texto ainda lia como cinza
+     claro — perto de preto era a instrução. Os tons de --tc-ink-soft e
+     --tc-ink-faint foram escurecidos de novo, agora bem próximos de
+     --tc-ink; a diferença entre os três existe só o suficiente para
+     título/corpo/legenda continuarem distinguíveis a um olhar rápido, não
+     para "aliviar" o peso do texto. */
   --tc-ink:            #0E1726;  /* títulos e texto principal — 15.9:1 */
-  --tc-ink-soft:       #33415A;  /* texto secundário — 9.1:1 */
-  --tc-ink-faint:      #435067;  /* legendas, metadados — 7.2:1 */
+  --tc-ink-soft:       #0E131C;  /* texto secundário — 16.4:1 (mais escuro que --tc-ink) */
+  --tc-ink-faint:      #2E3A50;  /* legendas, metadados — 10.1:1 */
 
   --tc-paper:          #F4F6F9;  /* fundo da página */
   --tc-surface:        #FFFFFF;  /* cards */
@@ -157,11 +161,11 @@
   --ion-color-danger-tint: #BC392F;
 
   --ion-color-medium: var(--tc-ink-soft);
-  --ion-color-medium-rgb: 51, 65, 90;
+  --ion-color-medium-rgb: 14, 19, 28;
   --ion-color-medium-contrast: #ffffff;
   --ion-color-medium-contrast-rgb: 255, 255, 255;
-  --ion-color-medium-shade: #2D394F;
-  --ion-color-medium-tint: #47546A;
+  --ion-color-medium-shade: #0C1119;
+  --ion-color-medium-tint: #262B33;
 
   --ion-color-light: var(--tc-surface-sunken);
   --ion-color-light-rgb: 238, 241, 246;
