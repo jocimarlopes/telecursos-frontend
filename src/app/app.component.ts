@@ -1,5 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
+import { NavigationEnd, Router } from '@angular/router';
+import { filter } from 'rxjs/operators';
+import { GoogleAnalyticsService } from './services/google-analytics.service';
 import { InstitutionService } from './services/institution.service';
 
 @Component({
@@ -15,11 +17,21 @@ export class AppComponent implements OnInit {
   constructor(
     private router: Router,
     private institution: InstitutionService,
+    private analytics: GoogleAnalyticsService,
   ) { }
 
   ngOnInit() {
     this.redirectLegacyCertificateLink();
     this.bootstrapTenant();
+    this.trackPageViews();
+  }
+
+  /** Um page_view por rota — o gtag.js vem com o pageview automático
+   * desligado (ver src/index.html) porque isso é uma SPA. */
+  private trackPageViews() {
+    this.router.events
+      .pipe(filter((event): event is NavigationEnd => event instanceof NavigationEnd))
+      .subscribe(event => this.analytics.trackPageView(event.urlAfterRedirects));
   }
 
   /**
