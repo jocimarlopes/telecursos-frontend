@@ -86,6 +86,21 @@ export class InstitutionService {
   }
 
   /**
+   * URL pública de verificação de um certificado. Espelha
+   * institution_base_url() do backend (app.py): o slug 'app' (instituição
+   * padrão) e os demais hosts de infraestrutura nunca viram subdomínio — a
+   * validação cai sempre no domínio raiz. Sem essa checagem, um certificado
+   * emitido pela própria Cursando.Pro gerava um link pra "app.cursando.pro",
+   * que não existe (só instituições parceiras de verdade têm subdomínio).
+   */
+  verificationUrl(slug: string, code: string): string {
+    const base = (!slug || this.nonTenant.includes(slug))
+      ? window.location.origin
+      : window.location.origin.replace(/^(https?:\/\/)/, `$1${slug}.`);
+    return `${base}/validar/${code}`;
+  }
+
+  /**
    * Repinta a cor de marca da página com a da instituição.
    * Só a cor de ação muda — a estrutura clara e o verde de autenticidade são
    * da plataforma e permanecem constantes, para que o selo de "verificado"

@@ -53,10 +53,11 @@ export class CertificatesPage implements OnInit {
     );
   }
 
-  /** Link público de verificação, no subdomínio da instituição emissora. */
+  /** Link público de verificação, no subdomínio da instituição emissora
+   * (quando ela tiver um — a instituição padrão valida no domínio raiz). */
   verifyUrl(certificate: any): string {
-    const base = window.location.origin.replace(/^(https?:\/\/)/, `$1${certificate.institution_slug}.`);
-    return `${base}/validar/${certificate.verification_code}`;
+    return this.institutions.verificationUrl(
+      certificate.institution_slug, certificate.verification_code);
   }
 
   copyVerifyLink(certificate: any) {
